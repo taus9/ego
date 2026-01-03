@@ -53,7 +53,6 @@ const (
 )
 
 var keywords = map[string]TokenType{
-	":=":    LET_INTERNAL,
 	"true":  TRUE,
 	"false": FALSE,
 	"if":    IF,
