@@ -70,8 +70,8 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.IDENT:
-		if p.peekTokenIs(token.ASSIGN) {
-			return p.parseAssignStatement()
+		if p.peekTokenIs(token.LET) {
+			return p.parseLetStatement()
 		}
 		return nil
 	case token.RETURN:
