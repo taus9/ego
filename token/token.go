@@ -40,7 +40,7 @@ const (
 
 	FUNCTION      = ":"
 	ANON_FUNCTION = ":>"
-	CLOSE_BLOCK   = ";"
+	END_BLOCK     = ";"
 	LET           = ":="
 
 	TRUE   = "TRUE"
@@ -49,7 +49,8 @@ const (
 	RETURN = "RET"
 
 	// used internally by the parsers
-	LET_INTERNAL = "$LET"
+	LET_INTERNAL   = "$LET"
+	BEGIN_INTERNAL = "$BEGIN"
 )
 
 var keywords = map[string]TokenType{
