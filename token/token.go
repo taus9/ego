@@ -46,6 +46,9 @@ const (
 	FALSE  = "FALSE"
 	IF     = "IF"
 	RETURN = "RET"
+
+	// used internally by the parsers
+	LET = "$LET"
 )
 
 var keywords = map[string]TokenType{
