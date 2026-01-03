@@ -1,6 +1,9 @@
 package ast
 
-import "ego/token"
+import (
+	"bytes"
+	"ego/token"
+)
 
 type LetStatement struct {
 	Token token.Token // the token.LET token
@@ -15,5 +18,15 @@ func (ls *LetStatement) TokenLiteral() string {
 }
 
 func (ls *LetStatement) String() string {
-	return ""
+	var out bytes.Buffer
+
+	out.WriteString(ls.TokenLiteral() + " ")
+	out.WriteString(ls.Name.String())
+	out.WriteString(" = ")
+
+	if ls.Value != nil {
+		out.WriteString(ls.Value.String())
+	}
+
+	return out.String()
 }
