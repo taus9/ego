@@ -55,6 +55,11 @@ func (l *Lexer) NextToken() token.Token {
 			l.readChar()
 			literal := string(ch) + string(l.ch)
 			tok = token.Token{Type: token.ANON_FUNCTION, Literal: literal}
+		} else if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.LET, Literal: literal}
 		} else {
 			tok = newToken(token.FUNCTION, l.ch)
 		}
