@@ -6,11 +6,11 @@ import (
 	"testing"
 )
 
-func TestAssignStatements(t *testing.T) {
+func TestLetStatements(t *testing.T) {
 	input := `
-	x = 5
-	y = 10
-	foobar = 838383
+	x := 5
+	y := 10
+	foobar := 838383
 	`
 
 	l := lexer.New(input)
@@ -36,7 +36,7 @@ func TestAssignStatements(t *testing.T) {
 
 	for i, tt := range tests {
 		stmt := program.Statements[i]
-		if !testAssignStatements(t, stmt, tt.expectedIdentifier) {
+		if !testLetStatements(t, stmt, tt.expectedIdentifier) {
 			return
 		}
 	}
@@ -55,15 +55,15 @@ func checkParseErrors(t *testing.T, p *Parser) {
 	t.FailNow()
 }
 
-func testAssignStatements(t *testing.T, s ast.Statement, name string) bool {
-	if s.TokenLiteral() != "=" {
-		t.Errorf("s.TokenLiteral not 'let'. got=%q", s.TokenLiteral())
+func testLetStatements(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "$LET" {
+		t.Errorf("s.TokenLiteral not '$LET'. got=%q", s.TokenLiteral())
 		return false
 	}
 
-	letStmt, ok := s.(*ast.AssignStatement)
+	letStmt, ok := s.(*ast.LetStatement)
 	if !ok {
-		t.Errorf("s not *ast.AssignStatement. got=%T", s)
+		t.Errorf("s not *ast.LetStatement. got=%T", s)
 		return false
 	}
 
