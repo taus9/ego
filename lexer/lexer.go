@@ -64,7 +64,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok = newToken(token.FUNCTION, l.ch)
 		}
 	case ';':
-		tok = newToken(token.CLOSE_BLOCK, l.ch)
+		tok = newToken(token.END_BLOCK, l.ch)
 	case '(':
 		tok = newToken(token.LPAREN, l.ch)
 	case ')':
