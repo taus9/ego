@@ -73,7 +73,7 @@ func (p *Parser) parseStatement() ast.Statement {
 		if p.peekTokenIs(token.LET) {
 			return p.parseLetStatement()
 		}
-		return nil
+		return p.parseExpressionStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
 	case token.EOL:
