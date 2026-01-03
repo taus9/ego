@@ -17,8 +17,9 @@ type Parser struct {
 
 	errors []string
 
-	curToken  token.Token
-	peekToken token.Token
+	curToken   token.Token
+	peekToken  token.Token
+	blockStack *BlockStack
 
 	prefixParseFns map[token.TokenType]prefixParseFn
 	infixParseFns  map[token.TokenType]infixParseFn
@@ -26,8 +27,9 @@ type Parser struct {
 
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
-		l:      l,
-		errors: []string{},
+		l:          l,
+		errors:     []string{},
+		blockStack: NewStack(),
 	}
 
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
@@ -38,6 +40,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.TRUE, p.parseBoolean)
 	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
+	p.registerPrefix(token.IF, p.parseIfExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
