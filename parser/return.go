@@ -10,7 +10,9 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	p.nextToken()
 
-	for !p.curTokenIs(token.EOL) {
+	stmt.ReturnValue = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.EOL) {
 		p.nextToken()
 	}
 

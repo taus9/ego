@@ -15,6 +15,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 		p.errors = append(p.errors, msg)
 		return nil
 	}
+	//p.nextToken()
 	lit.Value = value
 	return lit
 }
