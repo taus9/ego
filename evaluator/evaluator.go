@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	NULL  = &object.Null{}
+	NIL   = &object.Nil{}
 	TRUE  = &object.Boolean{Value: true}
 	FALSE = &object.Boolean{Value: false}
 )
@@ -16,6 +16,12 @@ func Eval(node ast.Node) object.Object {
 
 	case *ast.Program:
 		return evalStatements(node.Statements)
+
+	case *ast.BlockStatement:
+		return evalStatements(node.Statements)
+
+	case *ast.IfExpression:
+		return evalIfExpression(node)
 
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression)
@@ -64,7 +70,7 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 	case "-":
 		return evalMinusPrefixOperatorExpression(right)
 	default:
-		return NULL
+		return NIL
 	}
 }
 
@@ -74,7 +80,7 @@ func evalBangOperatorExpression(right object.Object) object.Object {
 		return FALSE
 	case FALSE:
 		return TRUE
-	case NULL:
+	case NIL:
 		return TRUE
 	default:
 		return FALSE
@@ -83,7 +89,7 @@ func evalBangOperatorExpression(right object.Object) object.Object {
 
 func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	if right.Type() != object.INTEGER_OBJ {
-		return NULL
+		return NIL
 	}
 	value := right.(*object.Integer).Value
 	return &object.Integer{Value: -value}
@@ -101,7 +107,7 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 		return nativeBoolToBooleanObject(left != right)
 
 	default:
-		return NULL
+		return NIL
 	}
 }
 
@@ -128,6 +134,30 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 		return nativeBoolToBooleanObject(leftVal != rightVal)
 
 	default:
-		return NULL
+		return NIL
+	}
+}
+
+func evalIfExpression(ie *ast.IfExpression) object.Object {
+	condition := Eval(ie.Condition)
+	if isTruthy(condition) {
+		return Eval(ie.Consequence)
+	} else if ie.Alternative != nil {
+		return Eval(ie.Alternative)
+	} else {
+		return NIL
+	}
+}
+
+func isTruthy(obj object.Object) bool {
+	switch obj {
+	case NIL:
+		return false
+	case TRUE:
+		return true
+	case FALSE:
+		return false
+	default:
+		return true
 	}
 }
