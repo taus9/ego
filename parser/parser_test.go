@@ -13,9 +13,9 @@ func TestLetStatements(t *testing.T) {
 		expectedIdentifier string
 		expectedValue      any
 	}{
-		{"x := 5", "x", 5},
-		{"y := true", "y", true},
-		{"foobar := y", "foobar", "y"},
+		{"x = 5", "x", 5},
+		{"y = true", "y", true},
+		{"foobar = y", "foobar", "y"},
 	}
 	for _, tt := range tests {
 		l := lexer.New(tt.input)

@@ -9,7 +9,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: token.Token{Type: token.LET_INTERNAL, Literal: token.LET_INTERNAL}}
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
-	if !p.expectPeek(token.LET) {
+	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
 
