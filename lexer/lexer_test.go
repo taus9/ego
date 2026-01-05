@@ -5,6 +5,23 @@ import (
 	"testing"
 )
 
+func TestStringToken(t *testing.T) {
+	input := "'testing'"
+
+	l := New(input)
+
+	tok := l.NextToken()
+	if tok.Type != token.STRING {
+		t.Fatalf("token type wrong. expected=%q, got=%q",
+			token.STRING, tok.Type)
+	}
+
+	if tok.Literal != "testing" {
+		t.Fatalf("literal wrong. expected=%q, got=%q",
+			"testing", tok.Literal)
+	}
+}
+
 func TestNextToken(t *testing.T) {
 	input := `
 	five = 5
@@ -22,6 +39,8 @@ func TestNextToken(t *testing.T) {
 	10 == 10
 	10 != 9
 	: sub = [0] - [1]
+	'foobar'
+	'foo bar'
 	`
 
 	tests := []struct {
@@ -100,6 +119,10 @@ func TestNextToken(t *testing.T) {
 		{token.LBRACKET, "["},
 		{token.INT, "1"},
 		{token.RBRACKET, "]"},
+		{token.EOL, "\n"},
+		{token.STRING, "foobar"},
+		{token.EOL, "\n"},
+		{token.STRING, "foo bar"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}

@@ -1,6 +1,9 @@
 package lexer
 
-import "ego/token"
+import (
+	"ego/token"
+	"errors"
+)
 
 type Lexer struct {
 	input        string
@@ -31,6 +34,7 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
 	switch l.ch {
+
 	case '=':
 		if l.peekChar() == '=' {
 			ch := l.ch
@@ -63,6 +67,15 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = newToken(token.FUNCTION, l.ch)
 		}
+	case '\'':
+		str, err := l.readString()
+		if err != nil {
+			tok.Type = token.UNTERMINATED_STRING
+		} else {
+			tok.Type = token.STRING
+		}
+		tok.Literal = str
+
 	case ';':
 		tok = newToken(token.END_BLOCK, l.ch)
 	case '(':
@@ -87,8 +100,6 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LT, l.ch)
 	case '>':
 		tok = newToken(token.GT, l.ch)
-	case '\'':
-		tok = newToken(token.SINGLE_QUOTE, l.ch)
 	case '[':
 		tok = newToken(token.LBRACKET, l.ch)
 	case ']':
@@ -159,4 +170,21 @@ func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\r' {
 		l.readChar()
 	}
+}
+
+func (l *Lexer) readString() (string, error) {
+	position := l.position + 1
+	err := error(nil)
+	for {
+		l.readChar()
+		if l.ch == '\'' {
+			break
+		}
+		if l.ch == '\n' || l.ch == 0 {
+			err = errors.New(token.UNTERMINATED_STRING)
+			break
+		}
+	}
+
+	return l.input[position:l.position], err
 }

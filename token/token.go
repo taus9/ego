@@ -8,13 +8,18 @@ type Token struct {
 }
 
 const (
-	ILLEGAL = "ILLEGAL"
-	EOL     = "EOL"
-	EOF     = "EOF"
+	ILLEGAL             = "ILLEGAL"
+	UNTERMINATED_STRING = "UNTERMINATED_STRING"
+
+	EOL = "EOL"
+	EOF = "EOF"
 
 	// Identifiers + literals
-	IDENT = "IDENT" // add, foobar, x, y, ...
-	INT   = "INT"   // 1343
+	IDENT  = "IDENT"  // add, foobar, x, y, ...
+	INT    = "INT"    // 1343
+	STRING = "STRING" // "foobar"
+
+	// Operators
 
 	ASSIGN   = "="
 	PLUS     = "+"
