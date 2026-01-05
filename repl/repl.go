@@ -8,6 +8,7 @@ import (
 	"ego/parser"
 	"fmt"
 	"io"
+	"strings"
 )
 
 const PROMT = ">> "
@@ -15,7 +16,7 @@ const PROMT = ">> "
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 	env := object.NewEnvironment()
-
+	blockCode := []string{}
 	for {
 		fmt.Fprintf(out, PROMT)
 		scanned := scanner.Scan()
@@ -23,11 +24,25 @@ func Start(in io.Reader, out io.Writer) {
 			return
 		}
 
-		line := scanner.Text()
-		l := lexer.New(line)
+		allLines := ""
+		line := scanner.Text() + "\n"
+
+		if len(blockCode) > 0 {
+			allLines = strings.Join(blockCode, "") + line
+		} else {
+			allLines = line
+		}
+
+		l := lexer.New(allLines)
 		p := parser.New(l)
 
 		program := p.ParseProgram()
+
+		if containsOpenBlockError(p.Errors()) {
+			blockCode = append(blockCode, line)
+			continue
+		}
+
 		if len(p.Errors()) != 0 {
 			printParserErrors(out, p.Errors())
 			continue
@@ -38,6 +53,8 @@ func Start(in io.Reader, out io.Writer) {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
 		}
+
+		blockCode = []string{}
 	}
 }
 
@@ -45,4 +62,13 @@ func printParserErrors(out io.Writer, errors []string) {
 	for _, msg := range errors {
 		io.WriteString(out, "\t"+msg+"\n")
 	}
+}
+
+func containsOpenBlockError(errors []string) bool {
+	for _, msg := range errors {
+		if msg == "unexpected end of file, missing end block" {
+			return true
+		}
+	}
+	return false
 }
