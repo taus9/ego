@@ -95,10 +95,23 @@ func (p *Parser) parseStatement() ast.Statement {
 			return p.parseLetStatement()
 		}
 		return p.parseExpressionStatement()
+
 	case token.RETURN:
 		return p.parseReturnStatement()
+
 	case token.EOL:
 		return nil
+
+	case token.UNTERMINATED_STRING:
+		msg := "unterminated string literal"
+		p.errors = append(p.errors, msg)
+		return nil
+
+	case token.ILLEGAL:
+		msg := fmt.Sprintf("illegal token: %s", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+
 	default:
 		return p.parseExpressionStatement()
 	}
