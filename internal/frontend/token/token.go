@@ -1,10 +1,16 @@
 package token
 
+type Span struct {
+	Line   int
+	Column int
+}
+
 type TokenType string
 
 type Token struct {
 	Type    TokenType
 	Literal string
+	Span    Span
 }
 
 const (
