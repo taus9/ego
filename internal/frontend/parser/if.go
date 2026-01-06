@@ -16,13 +16,15 @@ func (p *Parser) parseIfExpression() ast.Expression {
 	p.nextToken()
 
 	expression.Condition = p.parseExpression(LOWEST)
+	p.blockStack.Push(token.IF)
 
-	if !p.expectPeek(token.EOL) {
-		p.createErrorMessage("expected end of line after IF condition")
+	p.nextToken()
+
+	if !p.curTokenIs(token.EOL) {
+		p.createErrorMessage("expected EOL after IF condition")
 		return nil
 	}
 
-	p.blockStack.Push(token.IF)
 	expression.Consequence = p.parseBlockStatement()
 	p.blockStack.Pop()
 

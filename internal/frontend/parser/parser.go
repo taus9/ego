@@ -71,6 +71,10 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 	p.registerPrefix(token.LBRACE, p.parseMapLiteral)
 
+	// Glorified debugging no-op parsers to prevent nonsense errors
+	p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
+	p.registerPrefix(token.ELSE, p.parseElseExpression)
+
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
@@ -113,6 +117,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 		}
 		p.nextToken()
 	}
+
 	return program
 }
 

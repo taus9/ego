@@ -949,7 +949,7 @@ func TestParsingMapLiteralWithExpressions(t *testing.T) {
 }
 
 func TestIfParseErrors(t *testing.T) {
-	input := "if a"
+	input := "if a a ;"
 
 	l := lexer.New(input)
 	p := New(l)

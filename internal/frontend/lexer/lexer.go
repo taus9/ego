@@ -84,7 +84,8 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.STRING
 		}
 		tok.Literal = str
-		tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
+		// column -1 because when we call readString we advance past the opening quote
+		tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal) - 1}
 	case ';':
 		tok = l.newToken(token.END_BLOCK, l.ch)
 	case '(':
