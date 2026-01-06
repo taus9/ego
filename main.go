@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ego/repl"
+	"ego/internal/repl"
 	"fmt"
 	"os"
 	"os/user"
