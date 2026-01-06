@@ -1,0 +1,12 @@
+eql = :> x, y
+	if x == y
+		put('x equals y')
+	else
+		put('x does not equal y')
+	;
+;
+
+a = 10
+b = 10
+
+eql(a,b)
