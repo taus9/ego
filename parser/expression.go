@@ -3,17 +3,7 @@ package parser
 import (
 	"ego/ast"
 	"ego/token"
-)
-
-const (
-	_ int = iota
-	LOWEST
-	EQUALS
-	LESSGREATER
-	SUM
-	PRODUCT
-	PREFIX
-	CALL
+	"fmt"
 )
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
@@ -42,4 +32,30 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		leftExp = infix(leftExp)
 	}
 	return leftExp
+}
+
+func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
+	list := []ast.Expression{}
+
+	if p.peekTokenIs(end) {
+		p.nextToken()
+		return list
+	}
+
+	p.nextToken()
+	list = append(list, p.parseExpression(LOWEST))
+
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		list = append(list, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(end) {
+		msg := fmt.Sprintf("expected next token to be %s, got %s instead", end, p.peekToken.Type)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	return list
 }
