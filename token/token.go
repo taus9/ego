@@ -43,7 +43,7 @@ const (
 	LBRACE = "{"
 	RBRACE = "}"
 
-	FUNCTION      = ":"
+	COLON         = ":"
 	ANON_FUNCTION = ":>"
 	END_BLOCK     = ";"
 	LET           = ":="

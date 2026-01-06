@@ -65,7 +65,7 @@ func (l *Lexer) NextToken() token.Token {
 			literal := string(ch) + string(l.ch)
 			tok = token.Token{Type: token.LET, Literal: literal}
 		} else {
-			tok = newToken(token.FUNCTION, l.ch)
+			tok = newToken(token.COLON, l.ch)
 		}
 	case '\'':
 		str, err := l.readString()

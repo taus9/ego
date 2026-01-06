@@ -529,3 +529,37 @@ func TestBuiltinFunctionPush(t *testing.T) {
 		}
 	}
 }
+
+func TestHashLiterals(t *testing.T) {
+
+	input := "two = 'two' \n {'one': 1, two: 2, 'three': 3, 4: 4, true: 5, false: 6}"
+
+	evaluated := testEval(input)
+	hash, ok := evaluated.(*object.Map)
+	if !ok {
+		t.Fatalf("Eval didn't return Map. got=%T (%+v)", evaluated, evaluated)
+	}
+
+	expected := map[object.HashKey]int64{
+		(&object.String{Value: "one"}).HasKey():   1,
+		(&object.String{Value: "two"}).HasKey():   2,
+		(&object.String{Value: "three"}).HasKey(): 3,
+		(&object.Integer{Value: 4}).HasKey():      4,
+		TRUE.HasKey():                             5,
+		FALSE.HasKey():                            6,
+	}
+
+	if len(hash.Pairs) != len(expected) {
+		t.Fatalf("Hash has wrong number of pairs. got=%d, want=%d", len(hash.Pairs), len(expected))
+	}
+
+	for expectedKey, expectedValue := range expected {
+		pair, ok := hash.Pairs[expectedKey]
+		if !ok {
+			t.Errorf("no pair for given key in Pairs")
+			continue
+		}
+
+		testIntegerObject(t, pair.Value, expectedValue)
+	}
+}
