@@ -40,3 +40,6 @@ debug
 
 # Air live reload
 tmp/
+
+# test ego source files for ignore
+ignore/
