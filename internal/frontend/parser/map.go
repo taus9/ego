@@ -15,8 +15,7 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 		key := p.parseExpression(LOWEST)
 
 		if !p.expectPeek(token.COLON) {
-			msg := fmt.Sprintf("expected ':' after map key, got %s instead", p.peekToken.Type)
-			p.errors = append(p.errors, msg)
+			p.createErrorMessage(fmt.Sprintf("expected ':' after map key, got %s instead", p.peekToken.Type))
 			return nil
 		}
 
@@ -26,15 +25,13 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 		mapLiteral.Pairs[key] = value
 
 		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
-			msg := fmt.Sprintf("expected ',' or '}' after map pair, got %s instead", p.peekToken.Type)
-			p.errors = append(p.errors, msg)
+			p.createErrorMessage(fmt.Sprintf("expected ',' or '}' after map pair, got %s instead", p.peekToken.Type))
 			return nil
 		}
 	}
 
 	if !p.expectPeek(token.RBRACE) {
-		msg := fmt.Sprintf("expected '}' at end of map literal, got %s instead", p.peekToken.Type)
-		p.errors = append(p.errors, msg)
+		p.createErrorMessage(fmt.Sprintf("expected '}' at end of map literal, got %s instead", p.peekToken.Type))
 		return nil
 	}
 

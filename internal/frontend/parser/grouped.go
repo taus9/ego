@@ -11,6 +11,7 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	exp := p.parseExpression(LOWEST)
 
 	if !p.expectPeek(token.RPAREN) {
+		p.createErrorMessage("expected closing parenthesis for grouped expression")
 		return nil
 	}
 

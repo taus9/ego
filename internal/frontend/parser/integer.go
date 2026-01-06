@@ -11,8 +11,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
 	if err != nil {
-		msg := fmt.Sprintf("could not parse %s as integer", p.curToken.Literal)
-		p.errors = append(p.errors, msg)
+		p.createErrorMessage(fmt.Sprintf("could not parse %s as integer", p.curToken.Literal))
 		return nil
 	}
 	//p.nextToken()

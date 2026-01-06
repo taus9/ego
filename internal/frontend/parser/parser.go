@@ -93,9 +93,8 @@ func (p *Parser) Errors() []string {
 }
 
 func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected next token to be %s, got %s instead",
-		t, p.peekToken.Type)
-	p.errors = append(p.errors, msg)
+	p.createErrorMessage(fmt.Sprintf("expected next token to be %s, got %s instead",
+		t, p.peekToken.Type))
 }
 
 func (p *Parser) nextToken() {
@@ -132,13 +131,11 @@ func (p *Parser) parseStatement() ast.Statement {
 		return nil
 
 	case token.UNTERMINATED_STRING:
-		msg := "unterminated string literal"
-		p.errors = append(p.errors, msg)
+		p.createErrorMessage("unterminated string")
 		return nil
 
 	case token.ILLEGAL:
-		msg := fmt.Sprintf("illegal token: %s", p.curToken.Literal)
-		p.errors = append(p.errors, msg)
+		p.createErrorMessage(fmt.Sprintf("illegal token: %s", p.curToken.Literal))
 		return nil
 
 	default:
@@ -170,4 +167,9 @@ func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
 
 func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 	p.infixParseFns[tokenType] = fn
+}
+
+func (p *Parser) createErrorMessage(msg string) {
+	fullMsg := fmt.Sprintf("Line %d, Pos %d: %s", p.curToken.Span.Line, p.curToken.Span.Column, msg)
+	p.errors = append(p.errors, fullMsg)
 }

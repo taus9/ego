@@ -947,3 +947,13 @@ func TestParsingMapLiteralWithExpressions(t *testing.T) {
 		testFunc(value)
 	}
 }
+
+func TestIfParseErrors(t *testing.T) {
+	input := "\n\nif x < y x"
+
+	l := lexer.New(input)
+	p := New(l)
+	_ = p.ParseProgram()
+
+	checkParserErrors(t, p)
+}

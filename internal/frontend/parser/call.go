@@ -29,6 +29,7 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 	}
 
 	if !p.expectPeek(token.RPAREN) {
+		p.createErrorMessage("expected closing parenthesis for function call")
 		return nil
 	}
 

@@ -26,8 +26,7 @@ func (p *Parser) parseFunctionParameters() []*ast.Identifier {
 	}
 
 	if !p.expectPeek(token.EOL) {
-		msg := "expected EOL after function parameters"
-		p.errors = append(p.errors, msg)
+		p.createErrorMessage("expected EOL after function parameters")
 		return nil
 	}
 

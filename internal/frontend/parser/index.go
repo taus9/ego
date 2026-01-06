@@ -13,8 +13,7 @@ func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 	expression.Index = p.parseExpression(LOWEST)
 
 	if !p.expectPeek(token.RBRACKET) {
-		msg := fmt.Sprintf("expected ']' after index expression, got %s instead", p.peekToken.Literal)
-		p.errors = append(p.errors, msg)
+		p.createErrorMessage(fmt.Sprintf("expected ']' after index expression, got %s instead", p.peekToken.Literal))
 		return nil
 	}
 

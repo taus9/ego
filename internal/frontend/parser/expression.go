@@ -52,8 +52,7 @@ func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	}
 
 	if !p.expectPeek(end) {
-		msg := fmt.Sprintf("expected next token to be %s, got %s instead", end, p.peekToken.Type)
-		p.errors = append(p.errors, msg)
+		p.createErrorMessage(fmt.Sprintf("expected next token to be %s, got %s instead", end, p.peekToken.Type))
 		return nil
 	}
 

@@ -22,6 +22,7 @@ func New(input string) *Lexer {
 }
 
 func (l *Lexer) readChar() {
+
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
 	} else {
@@ -29,13 +30,7 @@ func (l *Lexer) readChar() {
 	}
 	l.position = l.readPosition
 	l.readPosition += 1
-
-	if l.ch == '\n' {
-		l.line++
-		l.column = 0
-	} else {
-		l.column++
-	}
+	l.column += 1
 }
 
 func (l *Lexer) NextToken() token.Token {
@@ -51,6 +46,7 @@ func (l *Lexer) NextToken() token.Token {
 			l.readChar()
 			literal := string(ch) + string(l.ch)
 			tok = token.Token{Type: token.EQ, Literal: literal}
+			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 		} else {
 			tok = l.newToken(token.ASSIGN, l.ch)
 		}
@@ -60,6 +56,7 @@ func (l *Lexer) NextToken() token.Token {
 			l.readChar()
 			literal := string(ch) + string(l.ch)
 			tok = token.Token{Type: token.NOT_EQ, Literal: literal}
+			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 		} else {
 			tok = l.newToken(token.BANG, l.ch)
 		}
@@ -69,11 +66,13 @@ func (l *Lexer) NextToken() token.Token {
 			l.readChar()
 			literal := string(ch) + string(l.ch)
 			tok = token.Token{Type: token.ANON_FUNCTION, Literal: literal}
+			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 		} else if l.peekChar() == '=' {
 			ch := l.ch
 			l.readChar()
 			literal := string(ch) + string(l.ch)
 			tok = token.Token{Type: token.LET, Literal: literal}
+			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 		} else {
 			tok = l.newToken(token.COLON, l.ch)
 		}
@@ -85,7 +84,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.STRING
 		}
 		tok.Literal = str
-
+		tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 	case ';':
 		tok = l.newToken(token.END_BLOCK, l.ch)
 	case '(':
@@ -116,17 +115,22 @@ func (l *Lexer) NextToken() token.Token {
 		tok = l.newToken(token.RBRACKET, l.ch)
 	case '\n':
 		tok = l.newToken(token.EOL, l.ch)
+		l.line++
+		l.column = 0
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
+		tok.Span = token.Span{Line: l.line, Column: l.column}
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
 			tok.Type = token.LoopupIdent(tok.Literal)
+			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 			return tok
 		} else if isDigit(l.ch) {
 			tok.Type = token.INT
 			tok.Literal = l.readNumber()
+			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 			return tok
 		} else {
 			tok = l.newToken(token.ILLEGAL, l.ch)

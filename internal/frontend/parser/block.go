@@ -25,14 +25,12 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 		p.nextToken()
 
 		if p.curTokenIs(token.ELSE) && p.blockStack.Peek() != token.IF {
-			msg := "unexpected ELSE without matching IF"
-			p.errors = append(p.errors, msg)
+			p.createErrorMessage("unexpected ELSE without matching IF")
 			return nil
 		}
 
 		if p.curTokenIs(token.EOF) {
-			msg := "unexpected end of file, missing end block"
-			p.errors = append(p.errors, msg)
+			p.createErrorMessage("unexpected end of file, missing end block")
 			return nil
 		}
 	}
