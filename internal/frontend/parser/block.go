@@ -24,9 +24,12 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	for !p.curTokenIs(token.END_BLOCK) && !p.curTokenIs(token.ELSE) {
 
 		stmt := p.parseStatement()
-		if stmt != nil {
-			block.Statements = append(block.Statements, stmt)
+
+		if p.errorsExist() {
+			return nil
 		}
+
+		block.Statements = append(block.Statements, stmt)
 
 		p.nextToken()
 

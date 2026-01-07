@@ -14,6 +14,10 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 		p.nextToken()
 		key := p.parseExpression(LOWEST)
 
+		if p.errorsExist() {
+			return nil
+		}
+
 		if !p.expectPeek(token.COLON) {
 			p.createErrorMessage(fmt.Sprintf("expected ':' after map key, got %s instead", p.peekToken.Type))
 			return nil
@@ -21,6 +25,10 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 
 		p.nextToken()
 		value := p.parseExpression(LOWEST)
+
+		if p.errorsExist() {
+			return nil
+		}
 
 		mapLiteral.Pairs[key] = value
 

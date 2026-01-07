@@ -9,7 +9,15 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 
 	anon.Parameters = p.parseFunctionParameters()
 
+	if p.errorsExist() {
+		return nil
+	}
+
 	anon.Body = p.parseBlockStatement()
+
+	if p.errorsExist() {
+		return nil
+	}
 
 	return anon
 }

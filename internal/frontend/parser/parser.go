@@ -42,8 +42,9 @@ type Parser struct {
 
 	errors []string
 
-	curToken   token.Token
-	peekToken  token.Token
+	curToken  token.Token
+	peekToken token.Token
+
 	blockStack *BlockStack
 
 	prefixParseFns map[token.TokenType]prefixParseFn
@@ -71,7 +72,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 	p.registerPrefix(token.LBRACE, p.parseMapLiteral)
 
-	// Glorified debugging no-op parsers to prevent nonsense errors
+	// unexpected tokens
+	p.registerPrefix(token.EOL, p.parseUnexpectedTokenError)
+	p.registerPrefix(token.EOF, p.parseUnexpectedTokenError)
 	//p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
 	//p.registerPrefix(token.ELSE, p.parseElseExpression)
 
@@ -114,7 +117,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 		stmt := p.parseStatement()
 
 		// Stop parsing on the first error encountered
-		if p.errors != nil {
+		if p.errorsExist() {
 			return program
 		}
 
@@ -184,4 +187,13 @@ func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 func (p *Parser) createErrorMessage(msg string) {
 	fullMsg := fmt.Sprintf("Line %d, Pos %d: %s", p.curToken.Span.Line, p.curToken.Span.Column, msg)
 	p.errors = append(p.errors, fullMsg)
+}
+
+func (p *Parser) parseUnexpectedTokenError() ast.Expression {
+	p.createErrorMessage(fmt.Sprintf("unexpected token: %s", p.curToken.Type))
+	return nil
+}
+
+func (p *Parser) errorsExist() bool {
+	return len(p.errors) > 0
 }

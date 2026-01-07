@@ -19,7 +19,12 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
+
 	leftExp := prefix()
+
+	if p.errorsExist() {
+		return nil
+	}
 
 	for !p.peekTokenIs(token.EOL) && precedence < p.peekPrecedence() {
 		infix := p.infixParseFns[p.peekToken.Type]
@@ -30,6 +35,13 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		p.nextToken()
 
 		leftExp = infix(leftExp)
+		if p.errorsExist() {
+			return nil
+		}
+	}
+
+	if p.errorsExist() {
+		return nil
 	}
 	return leftExp
 }
@@ -45,10 +57,18 @@ func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	p.nextToken()
 	list = append(list, p.parseExpression(LOWEST))
 
+	if p.errorsExist() {
+		return nil
+	}
+
 	for p.peekTokenIs(token.COMMA) {
 		p.nextToken()
 		p.nextToken()
 		list = append(list, p.parseExpression(LOWEST))
+
+		if p.errorsExist() {
+			return nil
+		}
 	}
 
 	if !p.expectPeek(end) {

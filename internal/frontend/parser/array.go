@@ -10,5 +10,9 @@ func (p *Parser) parseArrayLiteral() ast.Expression {
 
 	array.Elements = p.parseExpressionList(token.RBRACKET)
 
+	if p.errorsExist() {
+		return nil
+	}
+
 	return array
 }

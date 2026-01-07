@@ -18,6 +18,9 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	p.nextToken()
 
 	stmt.Value = p.parseExpression(LOWEST)
+	if p.errorsExist() {
+		return nil
+	}
 
 	if p.peekTokenIs(token.EOL) {
 		p.nextToken()

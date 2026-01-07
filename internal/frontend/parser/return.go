@@ -12,6 +12,10 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	stmt.ReturnValue = p.parseExpression(LOWEST)
 
+	if p.errorsExist() {
+		return nil
+	}
+
 	if p.peekTokenIs(token.EOL) {
 		p.nextToken()
 	}
