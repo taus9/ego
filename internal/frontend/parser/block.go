@@ -7,6 +7,7 @@ import (
 )
 
 func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	p.stackTrace.Push(BLOCK)
 	block := &ast.BlockStatement{
 		Token: token.Token{Type: token.BEGIN_INTERNAL,
 			Literal: token.BEGIN_INTERNAL,
@@ -25,7 +26,7 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 
 		stmt := p.parseStatement()
 
-		if p.errorsExist() {
+		if p.errorExist() {
 			return nil
 		}
 
@@ -44,6 +45,7 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 		}
 	}
 
+	p.stackTrace.Pop()
 	return block
 }
 

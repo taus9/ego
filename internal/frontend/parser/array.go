@@ -6,13 +6,15 @@ import (
 )
 
 func (p *Parser) parseArrayLiteral() ast.Expression {
+	p.stackTrace.Push(ARRAY)
 	array := &ast.ArrayLiteral{Token: p.curToken}
 
 	array.Elements = p.parseExpressionList(token.RBRACKET)
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 
+	p.stackTrace.Pop()
 	return array
 }

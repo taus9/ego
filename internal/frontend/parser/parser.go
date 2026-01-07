@@ -9,6 +9,19 @@ import (
 
 const (
 	_ int = iota
+	PROGRAM
+	ANON_FUNCTION
+	ARRAY
+	BLOCK
+	IF
+	LET
+	RETURN
+	MAP
+	CALL_ARGS
+)
+
+const (
+	_ int = iota
 	LOWEST
 	EQUALS
 	LESSGREATER
@@ -40,12 +53,13 @@ type (
 type Parser struct {
 	l *lexer.Lexer
 
-	errors []string
+	parseError *ParseError
 
 	curToken  token.Token
 	peekToken token.Token
 
-	blockStack *BlockStack
+	blockStack *Stack
+	stackTrace *Stack
 
 	prefixParseFns map[token.TokenType]prefixParseFn
 	infixParseFns  map[token.TokenType]infixParseFn
@@ -54,8 +68,9 @@ type Parser struct {
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
 		l:          l,
-		errors:     []string{},
+		parseError: nil,
 		blockStack: NewStack(),
+		stackTrace: NewStack(),
 	}
 
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
@@ -96,8 +111,8 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
-func (p *Parser) Errors() []string {
-	return p.errors
+func (p *Parser) ParseError() *ParseError {
+	return p.parseError
 }
 
 func (p *Parser) peekError(t token.TokenType) {
@@ -113,12 +128,13 @@ func (p *Parser) nextToken() {
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
+	p.stackTrace.Push(PROGRAM)
 
 	for p.curToken.Type != token.EOF {
 		stmt := p.parseStatement()
 
 		// Stop parsing on the first error encountered
-		if p.errorsExist() {
+		if p.errorExist() {
 			return program
 		}
 
@@ -185,9 +201,8 @@ func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 	p.infixParseFns[tokenType] = fn
 }
 
-func (p *Parser) createErrorMessage(msg string) {
-	fullMsg := fmt.Sprintf("Line %d, Pos %d: %s", p.curToken.Span.Line, p.curToken.Span.Column, msg)
-	p.errors = append(p.errors, fullMsg)
+func (p *Parser) createErrorMessage(messsage string) {
+	p.parseError = NewParseError(messsage, p.stackTrace, p.curToken)
 }
 
 func (p *Parser) parseUnexpectedTokenError() ast.Expression {
@@ -195,6 +210,6 @@ func (p *Parser) parseUnexpectedTokenError() ast.Expression {
 	return nil
 }
 
-func (p *Parser) errorsExist() bool {
-	return len(p.errors) > 0
+func (p *Parser) errorExist() bool {
+	return p.parseError != nil
 }

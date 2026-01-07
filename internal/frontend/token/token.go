@@ -1,5 +1,7 @@
 package token
 
+import "fmt"
+
 type Span struct {
 	Line   int
 	Column int
@@ -78,4 +80,8 @@ func LoopupIdent(ident string) TokenType {
 		return tok
 	}
 	return IDENT
+}
+
+func (t Token) String() string {
+	return fmt.Sprintf("Type: %s, Literal: %s, Line: %d, Column: %d", t.Type, t.Literal, t.Span.Line, t.Span.Column)
 }

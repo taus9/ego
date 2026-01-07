@@ -6,13 +6,14 @@ import (
 )
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
+	p.stackTrace.Push(RETURN)
 	stmt := &ast.ReturnStatement{Token: p.curToken}
 
 	p.nextToken()
 
 	stmt.ReturnValue = p.parseExpression(LOWEST)
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 
@@ -20,5 +21,6 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 		p.nextToken()
 	}
 
+	p.stackTrace.Pop()
 	return stmt
 }

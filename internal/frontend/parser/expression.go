@@ -22,7 +22,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 	leftExp := prefix()
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 
@@ -35,12 +35,12 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		p.nextToken()
 
 		leftExp = infix(leftExp)
-		if p.errorsExist() {
+		if p.errorExist() {
 			return nil
 		}
 	}
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 	return leftExp
@@ -57,7 +57,7 @@ func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	p.nextToken()
 	list = append(list, p.parseExpression(LOWEST))
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 
@@ -66,7 +66,7 @@ func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 		p.nextToken()
 		list = append(list, p.parseExpression(LOWEST))
 
-		if p.errorsExist() {
+		if p.errorExist() {
 			return nil
 		}
 	}

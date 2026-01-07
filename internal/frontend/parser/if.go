@@ -6,6 +6,7 @@ import (
 )
 
 func (p *Parser) parseIfExpression() ast.Expression {
+	p.stackTrace.Push(IF)
 	expression := &ast.IfExpression{Token: p.curToken}
 
 	if p.peekTokenIs(token.EOL) || p.peekTokenIs(token.EOF) {
@@ -17,7 +18,7 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 	expression.Condition = p.parseExpression(LOWEST)
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 
@@ -25,14 +26,14 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 	p.nextToken()
 
-	if !p.curTokenIs(token.EOL) && !p.errorsExist() {
+	if !p.curTokenIs(token.EOL) && !p.errorExist() {
 		p.createErrorMessage("expected EOL after IF condition")
 		return nil
 	}
 
 	expression.Consequence = p.parseBlockStatement()
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 
@@ -50,12 +51,13 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 		expression.Alternative = p.parseBlockStatement()
 
-		if p.errorsExist() {
+		if p.errorExist() {
 			return nil
 		}
 
 		p.blockStack.Pop()
 	}
 
+	p.stackTrace.Pop()
 	return expression
 }

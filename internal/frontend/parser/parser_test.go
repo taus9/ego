@@ -41,15 +41,12 @@ func TestLetStatements(t *testing.T) {
 }
 
 func checkParserErrors(t *testing.T, p *Parser) {
-	errors := p.Errors()
-	if len(errors) == 0 {
+	parseErrors := p.ParseError()
+	if parseErrors == nil {
 		return
 	}
 
-	t.Errorf("parser has %d error(s)", len(errors))
-	for _, msg := range errors {
-		t.Errorf("parser error: %q", msg)
-	}
+	t.Errorf("parser error: %s", parseErrors.Message)
 	t.FailNow()
 }
 

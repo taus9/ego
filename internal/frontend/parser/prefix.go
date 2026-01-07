@@ -20,7 +20,7 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 
 	expression.Right = p.parseExpression(PREFIX)
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 

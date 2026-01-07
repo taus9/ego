@@ -6,26 +6,30 @@ import (
 )
 
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
+	p.stackTrace.Push(CALL)
 	exp := &ast.CallExpression{Token: p.curToken, Function: function}
 	exp.Arguments = p.parseExpressionList(token.RPAREN)
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
+	p.stackTrace.Pop()
 	return exp
 }
 
 func (p *Parser) parseCallArguments() []ast.Expression {
+	p.stackTrace.Push(CALL_ARGS)
 	args := []ast.Expression{}
 
 	if p.peekTokenIs(token.RPAREN) {
 		p.nextToken()
+		p.stackTrace.Pop()
 		return args
 	}
 
 	p.nextToken()
 	args = append(args, p.parseExpression(LOWEST))
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 
@@ -33,7 +37,7 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 		p.nextToken()
 		p.nextToken()
 		args = append(args, p.parseExpression(LOWEST))
-		if p.errorsExist() {
+		if p.errorExist() {
 			return nil
 		}
 	}
@@ -43,5 +47,6 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 		return nil
 	}
 
+	p.stackTrace.Pop()
 	return args
 }

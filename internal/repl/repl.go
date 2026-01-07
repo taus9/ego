@@ -38,13 +38,13 @@ func Start(in io.Reader, out io.Writer) {
 
 		program := p.ParseProgram()
 
-		if containsOpenBlockError(p.Errors()) {
+		if containsOpenBlockError(p.ParseError().Message) {
 			blockCode = append(blockCode, line)
 			continue
 		}
 
-		if len(p.Errors()) != 0 {
-			printParserErrors(out, p.Errors())
+		if p.ParseError() != nil {
+			printParserErrors(out, p.ParseError().Message)
 			continue
 		}
 
@@ -58,17 +58,13 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
-func printParserErrors(out io.Writer, errors []string) {
-	for _, msg := range errors {
-		io.WriteString(out, "\t"+msg+"\n")
-	}
+func printParserErrors(out io.Writer, message string) {
+	io.WriteString(out, "\t"+message+"\n")
 }
 
-func containsOpenBlockError(errors []string) bool {
-	for _, msg := range errors {
-		if msg == "unexpected end of file, missing end block" {
-			return true
-		}
+func containsOpenBlockError(message string) bool {
+	if message == "unexpected end of file, missing end block" {
+		return true
 	}
 	return false
 }

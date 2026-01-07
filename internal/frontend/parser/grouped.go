@@ -15,7 +15,7 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 
 	exp := p.parseExpression(LOWEST)
 
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 

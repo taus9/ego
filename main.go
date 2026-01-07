@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"ego/internal/backend/eval/evaluator"
 	"ego/internal/backend/eval/object"
 	"ego/internal/frontend/lexer"
@@ -30,8 +31,8 @@ func main() {
 
 	program := p.ParseProgram()
 
-	if len(p.Errors()) != 0 {
-		printParserErrors(os.Stdout, p.Errors())
+	if p.ParseError() != nil {
+		printParserErrors(os.Stdout, p.ParseError())
 		os.Exit(1)
 	}
 
@@ -39,8 +40,55 @@ func main() {
 	evaluator.Eval(program, env)
 }
 
-func printParserErrors(out io.Writer, errors []string) {
-	for _, msg := range errors {
-		io.WriteString(out, "\t"+msg+"\n")
+func printParserErrors(out io.Writer, parseError *parser.ParseError) {
+	var buf bytes.Buffer
+	buf.WriteString("\t")
+	fmt.Fprintf(&buf, "Parser Error:   %s", parseError.Message)
+
+	span := parseError.Token.Span
+	fmt.Fprintf(&buf, "\n\tToken Location: line %d, column %d", span.Line, span.Column)
+
+	stack := parseError.StackTrace
+	size := stack.Size()
+	for i := size - 1; i >= 0; i-- {
+		element := stack.Elements()[i]
+		var msg string
+		switch i {
+		case size - 1:
+			msg = "\n\tStack trace:    -->"
+		case 0:
+			msg = "\t\t   "
+		}
+
+		buf.WriteString("\t")
+		fmt.Fprintf(&buf, "%s %s", msg, stackTraceItemToString(element.(int)))
+		buf.WriteString("\n")
+	}
+
+	io.WriteString(out, buf.String())
+}
+
+func stackTraceItemToString(item int) string {
+	switch item {
+	case parser.PROGRAM:
+		return "PROGRAM"
+	case parser.ANON_FUNCTION:
+		return "ANONYMOUS FUNCTION"
+	case parser.ARRAY:
+		return "ARRAY"
+	case parser.BLOCK:
+		return "BLOCK"
+	case parser.IF:
+		return "IF"
+	case parser.LET:
+		return "LET"
+	case parser.RETURN:
+		return "RETURN"
+	case parser.MAP:
+		return "MAP"
+	case parser.CALL_ARGS:
+		return "FUNCTION CALL ARGUMENTS"
+	default:
+		return "UNKNOWN"
 	}
 }

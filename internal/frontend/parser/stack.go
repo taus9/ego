@@ -39,3 +39,7 @@ func (s *Stack) IsEmpty() bool {
 func (s *Stack) Size() int {
 	return len(s.elements)
 }
+
+func (s *Stack) Elements() []any {
+	return s.elements
+}

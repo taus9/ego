@@ -7,6 +7,7 @@ import (
 )
 
 func (p *Parser) parseMapLiteral() ast.Expression {
+	p.stackTrace.Push(MAP)
 	mapLiteral := &ast.MapLiteral{Token: p.curToken}
 	mapLiteral.Pairs = make(map[ast.Expression]ast.Expression)
 
@@ -14,7 +15,7 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 		p.nextToken()
 		key := p.parseExpression(LOWEST)
 
-		if p.errorsExist() {
+		if p.errorExist() {
 			return nil
 		}
 
@@ -26,7 +27,7 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 		p.nextToken()
 		value := p.parseExpression(LOWEST)
 
-		if p.errorsExist() {
+		if p.errorExist() {
 			return nil
 		}
 
@@ -43,5 +44,6 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 		return nil
 	}
 
+	p.stackTrace.Pop()
 	return mapLiteral
 }

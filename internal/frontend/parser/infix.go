@@ -28,7 +28,7 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	precedence := p.currPrecedence()
 	p.nextToken()
 	expression.Right = p.parseExpression(precedence)
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 

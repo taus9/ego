@@ -11,7 +11,7 @@ func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 
 	p.nextToken()
 	expression.Index = p.parseExpression(LOWEST)
-	if p.errorsExist() {
+	if p.errorExist() {
 		return nil
 	}
 
