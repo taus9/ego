@@ -671,7 +671,7 @@ func TestFunctionLiteralParsing(t *testing.T) {
 			program.Statements[0])
 	}
 
-	function, ok := stmt.Expression.(*ast.FunctionLiteral)
+	function, ok := stmt.Expression.(*ast.AnonymousFunction)
 	if !ok {
 		t.Fatalf("stmt.Expression is not ast.FunctionLiteral. got=%T",
 			stmt.Expression)
@@ -716,7 +716,7 @@ func TestFunctionParameterParsing(t *testing.T) {
 		checkParserErrors(t, p)
 
 		stmt := program.Statements[0].(*ast.ExpressionStatement)
-		function := stmt.Expression.(*ast.FunctionLiteral)
+		function := stmt.Expression.(*ast.AnonymousFunction)
 
 		if len(function.Parameters) != len(tt.expectedParams) {
 			t.Errorf("length parameters wrong. want %d, got=%d\n",

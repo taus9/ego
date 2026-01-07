@@ -4,9 +4,9 @@ import (
 	"ego/internal/frontend/ast"
 )
 
-func (p *Parser) parseFunctionLiteral() ast.Expression {
+func (p *Parser) parseAnonymousFunction() ast.Expression {
 	p.stackTrace.Push(ANON_FUNCTION)
-	anon := &ast.FunctionLiteral{Token: p.curToken}
+	anon := &ast.AnonymousFunction{Token: p.curToken}
 
 	anon.Parameters = p.parseFunctionParameters()
 

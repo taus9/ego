@@ -6,31 +6,31 @@ import (
 	"strings"
 )
 
-type FunctionLiteral struct {
+type AnonymousFunction struct {
 	Token      token.Token
 	Parameters []*Identifier
 	Body       *BlockStatement
 }
 
-func (fl *FunctionLiteral) expressionNode() {}
+func (af *AnonymousFunction) expressionNode() {}
 
-func (fl *FunctionLiteral) TokenLiteral() string {
-	return fl.Token.Literal
+func (af *AnonymousFunction) TokenLiteral() string {
+	return af.Token.Literal
 }
 
-func (fl *FunctionLiteral) String() string {
+func (af *AnonymousFunction) String() string {
 	var out bytes.Buffer
 
 	params := []string{}
-	for _, p := range fl.Parameters {
+	for _, p := range af.Parameters {
 		params = append(params, p.String())
 	}
 
-	out.WriteString(fl.TokenLiteral())
+	out.WriteString(af.TokenLiteral())
 	out.WriteString("(")
 	out.WriteString(strings.Join(params, ", "))
 	out.WriteString(") ")
-	out.WriteString(fl.Body.String())
+	out.WriteString(af.Body.String())
 
 	return out.String()
 }
