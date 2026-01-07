@@ -75,8 +75,9 @@ func New(l *lexer.Lexer) *Parser {
 	// unexpected tokens
 	p.registerPrefix(token.EOL, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.EOF, p.parseUnexpectedTokenError)
-	//p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
-	//p.registerPrefix(token.ELSE, p.parseElseExpression)
+
+	p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
+	p.registerPrefix(token.ELSE, p.parseElseExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)

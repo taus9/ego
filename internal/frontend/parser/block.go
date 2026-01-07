@@ -47,35 +47,31 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	return block
 }
 
-// func (p *Parser) parseEndBlockStatement() ast.Expression {
-// 	// this function currently just prevents nonsense parsing errors
-// 	// when an END_BLOCK is encountered unexpectedly
-// 	p.nextToken()
-// 	if !p.curTokenIs(token.EOL) && !p.curTokenIs(token.EOF) {
-// 		p.createErrorMessage("token after END BLOCK must be EOL or EOF")
-// 	}
+func (p *Parser) parseEndBlockStatement() ast.Expression {
+	// this function currently just prevents nonsense parsing errors
+	// when an END_BLOCK is encountered unexpectedly
+	p.nextToken()
+	if !p.curTokenIs(token.EOL) && !p.curTokenIs(token.EOF) {
+		p.createErrorMessage("token after END BLOCK must be EOL or EOF")
+	}
 
-// 	if len(p.blockStack.elements) == 0 {
-// 		p.createErrorMessage("unexpected END BLOCK without matching BEGIN BLOCK")
-// 	} else {
-// 		p.blockStack.Pop()
-// 	}
-// 	return nil
-// }
+	if len(p.blockStack.elements) == 0 {
+		p.createErrorMessage("unexpected END BLOCK without matching BEGIN BLOCK")
+	} else {
+		p.blockStack.Pop()
+	}
+	return nil
+}
 
-// func (p *Parser) parseElseExpression() ast.Expression {
-// 	// this function currently just prevents nonsense parsing errors
-// 	// when an ELSE is encountered unexpectedly
-// 	p.nextToken()
+func (p *Parser) parseElseExpression() ast.Expression {
+	// this function currently just prevents nonsense parsing errors
+	// when an ELSE is encountered unexpectedly
+	p.nextToken()
 
-// 	if !p.curTokenIs(token.EOL) {
-// 		p.createErrorMessage("token after ELSE must be EOL")
-// 	}
-
-// 	if len(p.blockStack.elements) == 0 || p.blockStack.Peek() != token.IF {
-// 		p.createErrorMessage("unexpected ELSE without matching IF")
-// 	} else {
-// 		p.blockStack.Pop()
-// 	}
-// 	return nil
-// }
+	if len(p.blockStack.elements) == 0 || p.blockStack.Peek() != token.IF {
+		p.createErrorMessage("unexpected ELSE without matching IF")
+	} else {
+		p.blockStack.Pop()
+	}
+	return nil
+}
