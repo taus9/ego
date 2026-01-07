@@ -56,7 +56,7 @@ func printParserErrors(out io.Writer, parseError *parser.ParseError) {
 		switch i {
 		case size - 1:
 			msg = "\n\tStack trace:    -->"
-		case 0:
+		default:
 			msg = "\t\t   "
 		}
 
