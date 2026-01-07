@@ -72,8 +72,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.LBRACE, p.parseMapLiteral)
 
 	// Glorified debugging no-op parsers to prevent nonsense errors
-	p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
-	p.registerPrefix(token.ELSE, p.parseElseExpression)
+	//p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
+	//p.registerPrefix(token.ELSE, p.parseElseExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -112,9 +112,16 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 	for p.curToken.Type != token.EOF {
 		stmt := p.parseStatement()
+
+		// Stop parsing on the first error encountered
+		if p.errors != nil {
+			return program
+		}
+
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
 		}
+
 		p.nextToken()
 	}
 
