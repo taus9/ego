@@ -42,8 +42,8 @@ func main() {
 
 func printParserErrors(out io.Writer, parseError *parser.ParseError) {
 	var buf bytes.Buffer
-	buf.WriteString("\t")
-	fmt.Fprintf(&buf, "Parser Error:   %s", parseError.Message)
+	buf.WriteString("\tNope!\n")
+	fmt.Fprintf(&buf, "\tParser Error:   %s", parseError.Message)
 
 	span := parseError.Token.Span
 	fmt.Fprintf(&buf, "\n\tToken Location: line %d, column %d", span.Line, span.Column)
