@@ -88,6 +88,8 @@ func stackTraceItemToString(item int) string {
 		return "MAP"
 	case parser.CALL_ARGS:
 		return "FUNCTION CALL ARGUMENTS"
+	case parser.FUNC:
+		return "FUNCTION"
 	default:
 		return "UNKNOWN"
 	}
