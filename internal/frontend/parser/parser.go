@@ -18,6 +18,7 @@ const (
 	RETURN
 	MAP
 	CALL_ARGS
+	FUNC
 )
 
 const (
@@ -142,7 +143,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 			program.Statements = append(program.Statements, stmt)
 		}
 
-		p.nextToken()
+		//p.nextToken()
 	}
 
 	return program
@@ -155,6 +156,9 @@ func (p *Parser) parseStatement() ast.Statement {
 			return p.parseLetStatement()
 		}
 		return p.parseExpressionStatement()
+
+	case token.COLON:
+		return p.parseFunctionStatement()
 
 	case token.RETURN:
 		return p.parseReturnStatement()
