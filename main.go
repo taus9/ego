@@ -19,12 +19,15 @@ func main() {
 	}
 
 	filename := userArgs[0]
+	fmt.Printf("Running Ego file: %s\n", filename)
 
 	source, err := os.ReadFile(filename)
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
 		os.Exit(1)
 	}
+
+	fmt.Println("file loaded ok, beginning parsing...")
 
 	l := lexer.New(string(source))
 	p := parser.New(l)
@@ -38,6 +41,7 @@ func main() {
 
 	env := object.NewEnvironment()
 	evaluator.Eval(program, env)
+	fmt.Println("Program executed successfully.")
 }
 
 func printParserErrors(out io.Writer, parseError *parser.ParseError) {

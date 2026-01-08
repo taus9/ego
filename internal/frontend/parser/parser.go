@@ -91,6 +91,7 @@ func New(l *lexer.Lexer) *Parser {
 	// unexpected tokens
 	p.registerPrefix(token.EOL, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.EOF, p.parseUnexpectedTokenError)
+	p.registerPrefix(token.RBRACKET, p.parseUnexpectedTokenError)
 
 	p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
 	p.registerPrefix(token.ELSE, p.parseElseExpression)
@@ -164,6 +165,7 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseReturnStatement()
 
 	case token.EOL:
+		p.nextToken()
 		return nil
 
 	case token.UNTERMINATED_STRING:

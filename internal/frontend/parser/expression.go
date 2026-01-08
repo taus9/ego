@@ -49,32 +49,36 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	list := []ast.Expression{}
 
-	if p.peekTokenIs(end) {
-		p.nextToken()
+	if p.curTokenIs(end) {
+		p.nextToken() // consume end token
 		return list
 	}
 
-	p.nextToken()
 	list = append(list, p.parseExpression(LOWEST))
 
 	if p.errorExist() {
 		return nil
 	}
 
-	for p.peekTokenIs(token.COMMA) {
-		p.nextToken()
-		p.nextToken()
+	p.nextToken() // move to next token
+
+	for p.curTokenIs(token.COMMA) {
+		p.nextToken() // consume ',' token
+
 		list = append(list, p.parseExpression(LOWEST))
 
 		if p.errorExist() {
 			return nil
 		}
+
+		p.nextToken() // move to next token
 	}
 
-	if !p.expectPeek(end) {
+	if !p.curTokenIs(end) {
 		p.createErrorMessage(fmt.Sprintf("expected next token to be %s, got %s instead", end, p.peekToken.Type))
 		return nil
 	}
 
+	p.nextToken() // consume end token
 	return list
 }
