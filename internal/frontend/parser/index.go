@@ -9,16 +9,21 @@ import (
 func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 	expression := &ast.IndexExpression{Token: p.curToken, Left: left}
 
-	p.nextToken()
+	p.nextToken() // consume '['
+
 	expression.Index = p.parseExpression(LOWEST)
+
 	if p.errorExist() {
 		return nil
 	}
 
-	if !p.expectPeek(token.RBRACKET) {
+	p.nextToken() // consume token
+
+	if !p.curTokenIs(token.RBRACKET) {
 		p.createErrorMessage(fmt.Sprintf("expected ']' after index expression, got %s instead", p.peekToken.Literal))
 		return nil
 	}
 
+	p.nextToken() // consume ']'
 	return expression
 }
