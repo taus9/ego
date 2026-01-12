@@ -1056,7 +1056,7 @@ func TestFunctionStatementWithMultipleArgs(t *testing.T) {
 }
 
 func TestNewArray(t *testing.T) {
-	input := "add()"
+	input := "a + a + a"
 
 	l := lexer.New(input)
 	p := New(l)

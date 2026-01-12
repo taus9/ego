@@ -153,6 +153,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.IDENT:
+		defer p.nextToken()
 		if p.peekTokenIs(token.ASSIGN) {
 			return p.parseLetStatement()
 		}
@@ -177,6 +178,7 @@ func (p *Parser) parseStatement() ast.Statement {
 		return nil
 
 	default:
+		defer p.nextToken()
 		return p.parseExpressionStatement()
 	}
 }
