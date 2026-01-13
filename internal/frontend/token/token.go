@@ -61,6 +61,7 @@ const (
 	IF     = "IF"
 	ELSE   = "ELSE"
 	RETURN = "RET"
+	FOR    = "FOR"
 
 	// used internally by the parsers
 	LET_INTERNAL   = "$LET"
@@ -73,6 +74,7 @@ var keywords = map[string]TokenType{
 	"if":    IF,
 	"else":  ELSE,
 	"ret":   RETURN,
+	"for":   FOR,
 }
 
 func LoopupIdent(ident string) TokenType {

@@ -91,6 +91,7 @@ func TestNextToken(t *testing.T) {
 	'foo bar'
 	[1, 2]
 	{'foo': 'bar'}
+	for i = 0 to 9
 	`
 
 	tests := []struct {
@@ -185,6 +186,13 @@ func TestNextToken(t *testing.T) {
 		{token.COLON, ":"},
 		{token.STRING, "bar"},
 		{token.RBRACE, "}"},
+		{token.EOL, "\n"},
+		{token.FOR, "for"},
+		{token.IDENT, "i"},
+		{token.ASSIGN, "="},
+		{token.INT, "0"},
+		{token.IDENT, "to"},
+		{token.INT, "9"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}
