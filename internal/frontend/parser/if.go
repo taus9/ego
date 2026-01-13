@@ -58,6 +58,11 @@ func (p *Parser) parseIfExpression() ast.Expression {
 		p.blockStack.Pop()
 	}
 
+	if !p.peekTokenIs(token.EOL) && !p.peekTokenIs(token.EOF) {
+		p.createErrorMessage("token after END BLOCK must be EOL or EOF")
+		return nil
+	}
+
 	p.stackTrace.Pop()
 	return expression
 }

@@ -15,6 +15,7 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	}
 	block.Statements = []ast.Statement{}
 
+	// Handle empty block case with no EOLs after BEGIN BLOCK
 	if p.curTokenIs(token.END_BLOCK) {
 		p.nextToken() // consume END BLOCK token
 		if !p.curTokenIs(token.EOL) && !p.curTokenIs(token.EOF) {
@@ -24,8 +25,6 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 		p.stackTrace.Pop()
 		return block
 	}
-
-	p.nextToken()
 
 	if p.curTokenIs(token.EOF) {
 		p.createErrorMessage(fmt.Sprintf("missing END BLOCK for %s", p.blockStack.Peek()))
@@ -40,7 +39,9 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 			return nil
 		}
 
-		block.Statements = append(block.Statements, stmt)
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
 
 		p.nextToken()
 
@@ -53,13 +54,6 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 			p.createErrorMessage(fmt.Sprintf("missing END BLOCK for %s", p.blockStack.Peek()))
 			return nil
 		}
-	}
-
-	p.nextToken() // consume END BLOCK or ELSE token
-
-	if !p.curTokenIs(token.EOL) && !p.curTokenIs(token.EOF) {
-		p.createErrorMessage("token after END BLOCK must be EOL or EOF")
-		return nil
 	}
 
 	p.stackTrace.Pop()

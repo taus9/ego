@@ -10,6 +10,10 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
 	stmt.Expression = p.parseExpression(LOWEST)
 
+	if p.peekTokenIs(token.EOL) {
+		p.nextToken()
+	}
+
 	return stmt
 }
 
@@ -79,6 +83,5 @@ func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 		return nil
 	}
 
-	p.nextToken() // consume end token
 	return list
 }

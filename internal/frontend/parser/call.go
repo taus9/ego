@@ -9,7 +9,7 @@ func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	p.stackTrace.Push(CALL)
 	exp := &ast.CallExpression{Token: p.curToken, Function: function}
 	p.nextToken() // consume '('
-	exp.Arguments = p.parseCallArguments()
+	exp.Arguments = p.parseExpressionList(token.RPAREN)
 	if p.errorExist() {
 		return nil
 	}
