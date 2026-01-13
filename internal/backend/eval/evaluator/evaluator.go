@@ -61,6 +61,40 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		env.Set(node.Name.Value, val)
 
+	case *ast.ForToStatement:
+		startObj := Eval(node.Start, env)
+		if isError(startObj) {
+			return startObj
+		}
+		endObj := Eval(node.End, env)
+		if isError(endObj) {
+			return endObj
+		}
+
+		startInt, ok1 := startObj.(*object.Integer)
+		endInt, ok2 := endObj.(*object.Integer)
+		if !ok1 || !ok2 {
+			return newError("FOR loop bounds must be integers")
+		}
+
+		if startInt.Value <= endInt.Value {
+			for i := startInt.Value; i <= endInt.Value; i++ {
+				env.Set(node.Iterator.Value, &object.Integer{Value: i})
+				evalResult := Eval(node.Body, env)
+				if isError(evalResult) {
+					return evalResult
+				}
+			}
+		} else {
+			for i := startInt.Value; i >= endInt.Value; i-- {
+				env.Set(node.Iterator.Value, &object.Integer{Value: i})
+				evalResult := Eval(node.Body, env)
+				if isError(evalResult) {
+					return evalResult
+				}
+			}
+		}
+
 	case *ast.FunctionStatement:
 		function := &object.Function{Parameters: node.Parameters, Body: node.Body, Env: env}
 		env.Set(node.Name.Value, function)

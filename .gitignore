@@ -42,5 +42,5 @@ debug
 tmp/
 
 # test ego source files for ignore
-test.ego
+*.ego
 ignore/
