@@ -19,6 +19,7 @@ const (
 	MAP
 	CALL_ARGS
 	FUNC
+	FOR
 )
 
 const (
@@ -163,6 +164,9 @@ func (p *Parser) parseStatement() ast.Statement {
 
 	case token.RETURN:
 		return p.parseReturnStatement()
+
+	case token.FOR:
+		return p.parseForToStatement()
 
 	case token.EOL:
 		return nil

@@ -1045,6 +1045,53 @@ func TestFunctionStatementWithMultipleArgs(t *testing.T) {
 	}
 }
 
+func TestParsingForToStatement(t *testing.T) {
+	input := "for i = 0 + 2 to a \n ret i \n ;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
+			1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ForToStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ForToStatement. got=%T",
+			program.Statements[0])
+	}
+
+	if stmt.Iterator.Value != "i" {
+		t.Errorf("iterator is not 'i'. got=%s", stmt.Iterator.Value)
+	}
+
+	if !testInfixExpression(t, stmt.Start, 0, "+", 2) {
+		return
+	}
+
+	if !testIdentifier(t, stmt.End, "a") {
+		return
+	}
+
+	if len(stmt.Body.Statements) != 1 {
+		t.Fatalf("function.Body.Statements has not 1 statements. got=%d\n",
+			len(stmt.Body.Statements))
+	}
+
+	bodyStmt, ok := stmt.Body.Statements[0].(*ast.ReturnStatement)
+	if !ok {
+		t.Fatalf("function body stmt is not ast.ReturnStatement. got=%T",
+			stmt.Body.Statements[0])
+	}
+
+	if !testIdentifier(t, bodyStmt.ReturnValue, "i") {
+		return
+	}
+}
+
 func TestNewArray(t *testing.T) {
 	input := "a * [1, 2, 3, 4][b * c] * d"
 
