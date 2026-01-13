@@ -191,7 +191,7 @@ func TestNextToken(t *testing.T) {
 		{token.IDENT, "i"},
 		{token.ASSIGN, "="},
 		{token.INT, "0"},
-		{token.IDENT, "to"},
+		{token.TO, "to"},
 		{token.INT, "9"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
