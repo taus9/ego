@@ -61,6 +61,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		env.Set(node.Name.Value, val)
 
+	case *ast.FunctionStatement:
+		function := &object.Function{Parameters: node.Parameters, Body: node.Body, Env: env}
+		env.Set(node.Name.Value, function)
+
 	case *ast.AnonymousFunction:
 		params := node.Parameters
 		body := node.Body

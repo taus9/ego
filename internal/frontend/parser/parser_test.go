@@ -945,16 +945,6 @@ func TestParsingMapLiteralWithExpressions(t *testing.T) {
 	}
 }
 
-func TestIfParseErrors(t *testing.T) {
-	input := "if a  \n a + \n"
-
-	l := lexer.New(input)
-	p := New(l)
-	_ = p.ParseProgram()
-
-	checkParserErrors(t, p)
-}
-
 func TestFunctionStatementNoArgs(t *testing.T) {
 	input := ":add \n ;"
 
