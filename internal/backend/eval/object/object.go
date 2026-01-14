@@ -5,6 +5,7 @@ import (
 	"ego/internal/frontend/ast"
 	"fmt"
 	"hash/fnv"
+	"strconv"
 	"strings"
 )
 
@@ -13,6 +14,7 @@ type ObjectType string
 const (
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	INTEGER_OBJ      = "INTEGER"
+	FLOAT_OBJ        = "FLOAT"
 	BOOLEAN_OBJ      = "BOOLEAN"
 	NIL_OBJ          = "NIL"
 	ERROR_OBJ        = "ERROR"
@@ -34,6 +36,22 @@ type Integer struct {
 
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
+
+type Float struct {
+	Value float64
+}
+
+func (f *Float) Inspect() string {
+	s := strconv.FormatFloat(f.Value, 'g', -1, 64)
+
+	// If it looks like an integer, force ".0"
+	if !strings.ContainsAny(s, ".eE") {
+		s += ".0"
+	}
+
+	return s
+}
+func (f *Float) Type() ObjectType { return FLOAT_OBJ }
 
 type Boolean struct {
 	Value bool
