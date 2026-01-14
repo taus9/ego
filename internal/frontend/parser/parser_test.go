@@ -4,6 +4,8 @@ import (
 	"ego/internal/frontend/ast"
 	"ego/internal/frontend/lexer"
 	"fmt"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -277,12 +279,23 @@ func testFloatLiteral(t *testing.T, exp ast.Expression, value float64) bool {
 		t.Errorf("lit.Value not %f. got=%f", value, lit.Value)
 		return false
 	}
-	if lit.TokenLiteral() != fmt.Sprintf("%f", value) {
+	if lit.TokenLiteral() != formatFloatLiteral(value) {
 		t.Errorf("lit.TokenLiteral not %f. got=%s",
 			value, lit.TokenLiteral())
 		return false
 	}
 	return true
+}
+
+func formatFloatLiteral(value float64) string {
+	s := strconv.FormatFloat(value, 'g', -1, 64)
+
+	// If it looks like an integer, force ".0"
+	if !strings.ContainsAny(s, ".eE") {
+		s += ".0"
+	}
+
+	return s
 }
 
 func testIntegerLiteral(t *testing.T, exp ast.Expression, value int64) bool {
@@ -319,6 +332,16 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"5 % 5", 5, "%", 5},
 		{"5 == 5", 5, "==", 5},
 		{"5 != 5", 5, "!=", 5},
+		{"5.5 + 2.3", 5.5, "+", 2.3},
+		{"5.5 - 2.3", 5.5, "-", 2.3},
+		{"5.5 * 2.0", 5.5, "*", 2.0},
+		{"5.5 / 2.0", 5.5, "/", 2.0},
+		{"5.5 > 2.3", 5.5, ">", 2.3},
+		{"5.5 < 2.3", 5.5, "<", 2.3},
+		{"5.5 == 2.3", 5.5, "==", 2.3},
+		{"5.5 != 2.3", 5.5, "!=", 2.3},
+		{"true and false", true, "and", false},
+		{"true or false", true, "or", false},
 		{"true == true", true, "==", true},
 		{"true != false", true, "!=", false},
 		{"false == false", false, "==", false},
@@ -471,6 +494,18 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{
 			"add(a * b[2], b[1], 2 * [1, 2][1])",
 			"add((a * (b[2])), (b[1]), (2 * ([1, 2][1])))",
+		},
+		{
+			"a and b or c",
+			"((a and b) or c)",
+		},
+		{
+			"a or b and c",
+			"(a or (b and c))",
+		},
+		{
+			"a and b and c or d or e and f",
+			"((((a and b) and c) or d) or (e and f))",
 		},
 	}
 
