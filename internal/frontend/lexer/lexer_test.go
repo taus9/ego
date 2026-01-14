@@ -98,6 +98,8 @@ func TestNextToken(t *testing.T) {
 	y = 0.001
 	z = 10.0
 	x and y or z
+	x <= y
+	y >= z
 	`
 
 	tests := []struct {
@@ -224,6 +226,14 @@ func TestNextToken(t *testing.T) {
 		{token.AND, "and"},
 		{token.IDENT, "y"},
 		{token.OR, "or"},
+		{token.IDENT, "z"},
+		{token.EOL, "\n"},
+		{token.IDENT, "x"},
+		{token.LT_EQ, "<="},
+		{token.IDENT, "y"},
+		{token.EOL, "\n"},
+		{token.IDENT, "y"},
+		{token.GT_EQ, ">="},
 		{token.IDENT, "z"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
