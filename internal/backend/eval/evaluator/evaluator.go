@@ -4,7 +4,12 @@ import (
 	"ego/internal/backend/eval/object"
 	"ego/internal/frontend/ast"
 	"fmt"
+	"slices"
 )
+
+var reservedWords = []string{
+	"nil",
+}
 
 var (
 	NIL   = &object.Nil{}
@@ -55,6 +60,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalInfixExpression(node.Operator, left, right)
 
 	case *ast.LetStatement:
+		if isReservedWord(node.Name.Value) {
+			return newError("cannot use reserved word as identifier: %s", node.Name.Value)
+		}
 		val := Eval(node.Value, env)
 		if isError(val) {
 			return val
@@ -155,6 +163,14 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	}
 
 	return nil
+}
+
+func InitReservedValues(env *object.Environment) {
+	env.Set("nil", &object.Nil{})
+}
+
+func isReservedWord(word string) bool {
+	return slices.Contains(reservedWords, word)
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {

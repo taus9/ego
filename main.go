@@ -40,6 +40,7 @@ func main() {
 	}
 
 	env := object.NewEnvironment()
+	evaluator.InitReservedValues(env)
 	evalRes := evaluator.Eval(program, env)
 
 	if evalRes != nil && evalRes.Type() == object.ERROR_OBJ {
