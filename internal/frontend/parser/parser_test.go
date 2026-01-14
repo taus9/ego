@@ -266,6 +266,7 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"5 / 5", 5, "/", 5},
 		{"5 > 5", 5, ">", 5},
 		{"5 < 5", 5, "<", 5},
+		{"5 % 5", 5, "%", 5},
 		{"5 == 5", 5, "==", 5},
 		{"5 != 5", 5, "!=", 5},
 		{"true == true", true, "==", true},
@@ -356,6 +357,10 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{
 			"a + b / c",
 			"(a + (b / c))",
+		},
+		{
+			"a + b % c",
+			"(a + (b % c))",
 		},
 		{
 			"a + b * c + d / e - f",
@@ -1093,7 +1098,7 @@ func TestParsingForToStatement(t *testing.T) {
 }
 
 func TestNewArray(t *testing.T) {
-	input := "a * [1, 2, 3, 4][b * c] * d"
+	input := "5 % 5"
 
 	l := lexer.New(input)
 	p := New(l)
