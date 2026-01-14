@@ -3,6 +3,7 @@ package evaluator
 import (
 	"ego/internal/backend/eval/object"
 	"ego/internal/frontend/ast"
+	"ego/internal/frontend/token"
 	"fmt"
 	"slices"
 )
@@ -11,9 +12,12 @@ var reservedWords = []string{
 	"nil",
 }
 
+var currentToken token.Token
+
 var (
-	NIL   = &object.Nil{}
-	TRUE  = &object.Boolean{Value: true}
+	NIL  = &object.Nil{}
+	TRUE = &object.Boolean{
+		Value: true}
 	FALSE = &object.Boolean{Value: false}
 )
 
@@ -24,12 +28,15 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalProgram(node.Statements, env)
 
 	case *ast.BlockStatement:
+		currentToken = node.Token
 		return evalBlockStatement(node, env)
 
 	case *ast.IfExpression:
+		currentToken = node.Token
 		return evalIfExpression(node, env)
 
 	case *ast.ReturnStatement:
+		currentToken = node.Token
 		val := Eval(node.ReturnValue, env)
 		if isError(val) {
 			return val
@@ -37,9 +44,11 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.ReturnValue{Value: val}
 
 	case *ast.ExpressionStatement:
+		currentToken = node.Token
 		return Eval(node.Expression, env)
 
 	case *ast.PrefixExpression:
+		currentToken = node.Token
 		right := Eval(node.Right, env)
 		if isError(right) {
 			return right
@@ -47,6 +56,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalPrefixExpression(node.Operator, right)
 
 	case *ast.InfixExpression:
+		currentToken = node.Token
 		left := Eval(node.Left, env)
 		if isError(left) {
 			return left
@@ -60,7 +70,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalInfixExpression(node.Operator, left, right)
 
 	case *ast.LetStatement:
+		currentToken = node.Token
 		if isReservedWord(node.Name.Value) {
+
 			return newError("cannot use reserved word as identifier: %s", node.Name.Value)
 		}
 		val := Eval(node.Value, env)
@@ -70,6 +82,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		env.Set(node.Name.Value, val)
 
 	case *ast.ForWhileStatement:
+		currentToken = node.Token
 		conditionObj := Eval(node.Condition, env)
 		if isError(conditionObj) {
 			return conditionObj
@@ -87,6 +100,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 	case *ast.ForToStatement:
+		currentToken = node.Token
 		startObj := Eval(node.Start, env)
 		if isError(startObj) {
 			return startObj
@@ -121,15 +135,18 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 	case *ast.FunctionStatement:
+		currentToken = node.Token
 		function := &object.Function{Parameters: node.Parameters, Body: node.Body, Env: env}
 		env.Set(node.Name.Value, function)
 
 	case *ast.AnonymousFunction:
+		currentToken = node.Token
 		params := node.Parameters
 		body := node.Body
 		return &object.Function{Parameters: params, Body: body, Env: env}
 
 	case *ast.CallExpression:
+		currentToken = node.Token
 		function := Eval(node.Function, env)
 		if isError(function) {
 			return function
@@ -143,6 +160,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return applyFunction(function, args)
 
 	case *ast.IndexExpression:
+		currentToken = node.Token
 		left := Eval(node.Left, env)
 		if isError(left) {
 			return left
@@ -156,21 +174,27 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalIndexExpression(left, index)
 
 	case *ast.MapLiteral:
+		currentToken = node.Token
 		return evalMapLiteral(node, env)
 
 	case *ast.Identifier:
+		currentToken = node.Token
 		return evalIdentifier(node, env)
 
 	case *ast.StringLiteral:
+		currentToken = node.Token
 		return &object.String{Value: node.Value}
 
 	case *ast.FloatLiteral:
+		currentToken = node.Token
 		return &object.Float{Value: node.Value}
 
 	case *ast.IntegerLiteral:
+		currentToken = node.Token
 		return &object.Integer{Value: node.Value}
 
 	case *ast.ArrayLiteral:
+		currentToken = node.Token
 		elements := evalExpressions(node.Elements, env)
 		if len(elements) == 1 && isError(elements[0]) {
 			return elements[0]
@@ -178,6 +202,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.Array{Elements: elements}
 
 	case *ast.Boolean:
+		currentToken = node.Token
 		return nativeBoolToBooleanObject(node.Value)
 
 	}
@@ -270,6 +295,7 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 		return nativeBoolToBooleanObject(left != right)
 
 	case left.Type() != right.Type():
+
 		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
 
 	case left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ:
@@ -394,7 +420,12 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 }
 
 func newError(format string, a ...interface{}) *object.Error {
-	return &object.Error{Message: fmt.Sprintf(format, a...)}
+	msg := "Runtime Error: " + fmt.Sprintf(format, a...)
+	if currentToken.Type != token.ILLEGAL {
+		span := currentToken.Span
+		msg += fmt.Sprintf(" (line %d, column %d)", span.Line, span.Column)
+	}
+	return &object.Error{Message: msg}
 }
 
 func isError(obj object.Object) bool {
