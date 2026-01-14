@@ -25,6 +25,7 @@ const (
 	// Identifiers + literals
 	IDENT  = "IDENT"  // add, foobar, x, y, ...
 	INT    = "INT"    // 1343
+	FLOAT  = "FLOAT"  // 3.14
 	STRING = "STRING" // "foobar"
 
 	// Operators
@@ -79,7 +80,7 @@ var keywords = map[string]TokenType{
 	"to":    TO,
 }
 
-func LoopupIdent(ident string) TokenType {
+func LookupIdent(ident string) TokenType {
 	if tok, ok := keywords[ident]; ok {
 		return tok
 	}

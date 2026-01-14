@@ -3,6 +3,7 @@ package lexer
 import (
 	"ego/internal/frontend/token"
 	"errors"
+	"strings"
 )
 
 type Lexer struct {
@@ -127,12 +128,17 @@ func (l *Lexer) NextToken() token.Token {
 	default:
 		if isLetter(l.ch) {
 			tok.Literal = l.readIdentifier()
-			tok.Type = token.LoopupIdent(tok.Literal)
+			tok.Type = token.LookupIdent(tok.Literal)
 			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 			return tok
 		} else if isDigit(l.ch) {
-			tok.Type = token.INT
 			tok.Literal = l.readNumber()
+			if strings.Contains(tok.Literal, ".") {
+				tok.Type = token.FLOAT
+			} else {
+				tok.Type = token.INT
+			}
+
 			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 			return tok
 		} else {
@@ -158,10 +164,24 @@ func isLetter(ch byte) bool {
 
 func (l *Lexer) readNumber() string {
 	position := l.position
-	for isDigit(l.ch) {
+	hasDot := false
+	for isDigit(l.ch) || (l.ch == '.' && !hasDot) {
+		if l.ch == '.' {
+			hasDot = true
+		}
 		l.readChar()
 	}
-	return l.input[position:l.position]
+
+	number := l.input[position:l.position]
+	// If the number ends with a dot, backtrack one position
+	if hasDot && number[len(number)-1] == '.' {
+		l.position--
+		l.readPosition--
+		l.column--
+		number = l.input[position:l.position]
+	}
+
+	return number
 }
 
 func isDigit(ch byte) bool {

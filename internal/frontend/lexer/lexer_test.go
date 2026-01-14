@@ -94,6 +94,9 @@ func TestNextToken(t *testing.T) {
 	for i = 0 to 9
 		reminder = i % 2
 	;
+	x = 3.14
+	y = 0.001
+	z = 10.0
 	`
 
 	tests := []struct {
@@ -203,6 +206,18 @@ func TestNextToken(t *testing.T) {
 		{token.INT, "2"},
 		{token.EOL, "\n"},
 		{token.END_BLOCK, ";"},
+		{token.EOL, "\n"},
+		{token.IDENT, "x"},
+		{token.ASSIGN, "="},
+		{token.FLOAT, "3.14"},
+		{token.EOL, "\n"},
+		{token.IDENT, "y"},
+		{token.ASSIGN, "="},
+		{token.FLOAT, "0.001"},
+		{token.EOL, "\n"},
+		{token.IDENT, "z"},
+		{token.ASSIGN, "="},
+		{token.FLOAT, "10.0"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}
