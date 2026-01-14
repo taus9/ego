@@ -420,10 +420,10 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 }
 
 func newError(format string, a ...interface{}) *object.Error {
-	msg := "Runtime Error: " + fmt.Sprintf(format, a...)
+	msg := "\tRuntime Error: \n\t\t" + fmt.Sprintf(format, a...)
 	if currentToken.Type != token.ILLEGAL {
 		span := currentToken.Span
-		msg += fmt.Sprintf(" (line %d, column %d)", span.Line, span.Column)
+		msg += fmt.Sprintf("\n\t\tat line %d, column %d", span.Line, span.Column)
 	}
 	return &object.Error{Message: msg}
 }
