@@ -43,6 +43,8 @@ var precedences = map[token.TokenType]int{
 	token.NOT_EQ:   EQUALS,
 	token.LT:       LESSGREATER,
 	token.GT:       LESSGREATER,
+	token.LT_EQ:    LESSGREATER,
+	token.GT_EQ:    LESSGREATER,
 	token.PLUS:     SUM,
 	token.MINUS:    SUM,
 	token.SLASH:    PRODUCT,
@@ -117,6 +119,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.MOD, p.parseInfixExpression)
 	p.registerInfix(token.OR, p.parseInfixExpression)
 	p.registerInfix(token.AND, p.parseInfixExpression)
+	p.registerInfix(token.LT_EQ, p.parseInfixExpression)
+	p.registerInfix(token.GT_EQ, p.parseInfixExpression)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()

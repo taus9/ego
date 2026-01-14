@@ -340,6 +340,8 @@ func TestParsingInfixExpressions(t *testing.T) {
 		{"5.5 < 2.3", 5.5, "<", 2.3},
 		{"5.5 == 2.3", 5.5, "==", 2.3},
 		{"5.5 != 2.3", 5.5, "!=", 2.3},
+		{"5.5 <= 2.3", 5.5, "<=", 2.3},
+		{"5.5 >= 2.3", 5.5, ">=", 2.3},
 		{"true and false", true, "and", false},
 		{"true or false", true, "or", false},
 		{"true == true", true, "==", true},
@@ -506,6 +508,22 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{
 			"a and b and c or d or e and f",
 			"((((a and b) and c) or d) or (e and f))",
+		},
+		{
+			"5 + 3 >= 4",
+			"((5 + 3) >= 4)",
+		},
+		{
+			"5 + 3 <= 4",
+			"((5 + 3) <= 4)",
+		},
+		{
+			"5 + 3 >= 4 + 2",
+			"((5 + 3) >= (4 + 2))",
+		},
+		{
+			"5 + 3 <= 4 + 2",
+			"((5 + 3) <= (4 + 2))",
 		},
 	}
 
