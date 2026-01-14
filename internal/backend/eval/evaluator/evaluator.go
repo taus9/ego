@@ -234,6 +234,12 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
 	switch {
+	case operator == "and":
+		return nativeBoolToBooleanObject(isTruthy(left) && isTruthy(right))
+
+	case operator == "or":
+		return nativeBoolToBooleanObject(isTruthy(left) || isTruthy(right))
+
 	case left.Type() == object.FLOAT_OBJ || right.Type() == object.FLOAT_OBJ:
 		return evalFloatInfixExpression(operator, left, right)
 
