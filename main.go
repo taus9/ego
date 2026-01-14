@@ -41,7 +41,8 @@ func main() {
 
 	env := object.NewEnvironment()
 	evalRes := evaluator.Eval(program, env)
-	if evalRes.Type() == object.ERROR_OBJ {
+
+	if evalRes != nil && evalRes.Type() == object.ERROR_OBJ {
 		fmt.Println(evalRes.Inspect())
 	}
 	// fmt.Println("Program executed successfully.")

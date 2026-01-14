@@ -1,3 +1,0 @@
-for i = 9 to 0
-    put(str(i))
-;
