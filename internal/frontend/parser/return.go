@@ -11,6 +11,11 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	p.nextToken()
 
+	if p.curTokenIs(token.EOL) {
+		stmt.ReturnValue = nil
+		return stmt
+	}
+
 	stmt.ReturnValue = p.parseExpression(LOWEST)
 
 	if p.errorExist() {
