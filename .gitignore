@@ -42,5 +42,7 @@ debug
 tmp/
 
 # test ego source files for ignore
-*.ego
 ignore/
+
+# ego binary
+ego

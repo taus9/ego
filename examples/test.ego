@@ -1,0 +1,5 @@
+a = ['1']
+
+a = change(a, 0, 'changed')
+
+put(a)
