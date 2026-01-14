@@ -1,12 +1,15 @@
 package object
 
-import "testing"
+import (
+	"ego/internal/backend/eval/object"
+	"testing"
+)
 
 func TestStringMapKey(t *testing.T) {
-	hello1 := &String{Value: "Hello World"}
-	hello2 := &String{Value: "Hello World"}
-	diff1 := &String{Value: "My name is johnny"}
-	diff2 := &String{Value: "My name is johnny"}
+	hello1 := &object.String{Value: "Hello World"}
+	hello2 := &object.String{Value: "Hello World"}
+	diff1 := &object.String{Value: "My name is johnny"}
+	diff2 := &object.String{Value: "My name is johnny"}
 
 	if hello1.HasKey() != hello2.HasKey() {
 		t.Errorf("strings with the same content have different hash keys")
