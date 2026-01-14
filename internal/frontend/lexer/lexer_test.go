@@ -92,6 +92,8 @@ func TestNextToken(t *testing.T) {
 	[1, 2]
 	{'foo': 'bar'}
 	for i = 0 to 9
+		reminder = i % 2
+	;
 	`
 
 	tests := []struct {
@@ -193,6 +195,14 @@ func TestNextToken(t *testing.T) {
 		{token.INT, "0"},
 		{token.TO, "to"},
 		{token.INT, "9"},
+		{token.EOL, "\n"},
+		{token.IDENT, "reminder"},
+		{token.ASSIGN, "="},
+		{token.IDENT, "i"},
+		{token.MOD, "%"},
+		{token.INT, "2"},
+		{token.EOL, "\n"},
+		{token.END_BLOCK, ";"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}
