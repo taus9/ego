@@ -1,5 +1,5 @@
-a = ['1']
+a = 6
 
-a = change(a, 0, 'changed')
-
-put(a)
+if a <= 5
+    put('a is less than or equal to 5')
+;
