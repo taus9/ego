@@ -13,22 +13,25 @@ for <ident> = <exp> to <exp>
 
 */
 
-func (p *Parser) parseForToStatement() *ast.ForToStatement {
+func (p *Parser) parseForStatement() ast.Statement {
 	p.stackTrace.Push(FOR)
-	fts := &ast.ForToStatement{Token: p.curToken}
-
 	p.nextToken() // consume 'for' token
 
-	if !p.curTokenIs(token.IDENT) {
-		p.createErrorMessage("expected valid identifier after 'for'")
-		return nil
+	if p.curTokenIs(token.IDENT) && p.peekTokenIs(token.ASSIGN) {
+		return p.parseForToStatement()
 	}
 
-	// Index identifier
+	p.createErrorMessage("unsupported for statement format")
+	return nil
+}
+
+func (p *Parser) parseForToStatement() *ast.ForToStatement {
+	fts := &ast.ForToStatement{Token: token.Token{Type: token.FOR, Literal: "for"}}
 	fts.Iterator = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 	p.nextToken() // consume identifier
 
+	// redundant check
 	if !p.curTokenIs(token.ASSIGN) {
 		p.createErrorMessage("expected '=' after for index identifier")
 		return nil

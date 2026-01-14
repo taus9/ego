@@ -176,7 +176,7 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseReturnStatement()
 
 	case token.FOR:
-		return p.parseForToStatement()
+		return p.parseForStatement()
 
 	case token.EOL:
 		return nil
