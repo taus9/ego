@@ -1137,6 +1137,49 @@ func TestFunctionStatementWithMultipleArgs(t *testing.T) {
 	}
 }
 
+func TestParsingForWhileStatement(t *testing.T) {
+	input := "for i < 5 \n i = i + 1 \n ;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
+			1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ForWhileStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ForWhileStatement. got=%T",
+			program.Statements[0])
+	}
+
+	if !testInfixExpression(t, stmt.Condition, "i", "<", 5) {
+		return
+	}
+
+	if len(stmt.Body.Statements) != 1 {
+		t.Fatalf("function.Body.Statements has not 1 statements. got=%d\n",
+			len(stmt.Body.Statements))
+	}
+
+	bodyStmt, ok := stmt.Body.Statements[0].(*ast.LetStatement)
+	if !ok {
+		t.Fatalf("function body stmt is not ast.LetStatement. got=%T",
+			stmt.Body.Statements[0])
+	}
+
+	if bodyStmt.Name.Value != "i" {
+		t.Errorf("let name is not 'i'. got=%s", bodyStmt.Name.Value)
+	}
+
+	if !testInfixExpression(t, bodyStmt.Value, "i", "+", 1) {
+		return
+	}
+}
+
 func TestParsingForToStatement(t *testing.T) {
 	input := "for i = 0 + 2 to a \n ret i \n ;"
 

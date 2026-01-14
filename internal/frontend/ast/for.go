@@ -34,3 +34,27 @@ func (fts *ForToStatement) String() string {
 
 	return out.String()
 }
+
+type ForWhileStatement struct {
+	Token     token.Token
+	Condition Expression
+	Body      *BlockStatement
+}
+
+func (fws *ForWhileStatement) statementNode() {}
+
+func (fws *ForWhileStatement) TokenLiteral() string {
+	return fws.Token.Literal
+}
+
+func (fws *ForWhileStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(fws.TokenLiteral())
+	out.WriteString(" ")
+	out.WriteString(fws.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(fws.Body.String())
+
+	return out.String()
+}

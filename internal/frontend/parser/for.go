@@ -21,8 +21,38 @@ func (p *Parser) parseForStatement() ast.Statement {
 		return p.parseForToStatement()
 	}
 
-	p.createErrorMessage("unsupported for statement format")
-	return nil
+	return p.parseForWhileStatement()
+}
+
+func (p *Parser) parseForWhileStatement() *ast.ForWhileStatement {
+	fws := &ast.ForWhileStatement{Token: token.Token{Type: token.FOR, Literal: "for"}}
+	
+	condition := p.parseExpression(LOWEST)
+
+	if p.errorExist() {
+		return nil
+	}
+
+	fws.Condition = condition
+	p.nextToken()
+
+	if !p.curTokenIs(token.EOL) {
+		p.createErrorMessage("expected EOL after for while condition expression")
+		return nil
+	}
+
+	p.blockStack.Push(token.FOR)
+	fws.Body = p.parseBlockStatement()
+
+	if p.errorExist() {
+		return nil
+	}
+
+	p.blockStack.Pop()
+
+	//END BLOCK token already consumed in parseBlockStatement
+	p.stackTrace.Pop()
+	return fws
 }
 
 func (p *Parser) parseForToStatement() *ast.ForToStatement {
