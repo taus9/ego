@@ -14,21 +14,33 @@ import (
 func main() {
 	userArgs := os.Args[1:]
 	if len(userArgs) == 0 {
-		fmt.Println("No file provided.")
-		os.Exit(1)
+		showUsage()
+		os.Exit(0)
 	}
 
-	filename := userArgs[0]
-	// fmt.Printf("Running Ego file: %s\n", filename)
+	switch userArgs[0] {
 
-	source, err := os.ReadFile(filename)
-	if err != nil {
-		fmt.Printf("Error reading file: %v\n", err)
-		os.Exit(1)
+	case "-v":
+		fmt.Println("ego version 0.1.0")
+		return
+
+	case "-h":
+		showUsage()
+		return
+
+	default:
+		// assume it's a filename
+		filename := userArgs[0]
+		source, err := os.ReadFile(filename)
+		if err != nil {
+			fmt.Printf("Error reading file: %v\n", err)
+			os.Exit(1)
+		}
+		run(string(source))
 	}
+}
 
-	// fmt.Println("file loaded ok, beginning parsing...")
-
+func run(source string) {
 	l := lexer.New(string(source))
 	p := parser.New(l)
 
@@ -46,7 +58,23 @@ func main() {
 	if evalRes != nil && evalRes.Type() == object.ERROR_OBJ {
 		fmt.Println(evalRes.Inspect())
 	}
-	// fmt.Println("Program executed successfully.")
+}
+
+func showUsage() {
+	fmt.Println(`The Ego programming language CLI
+
+Usage:
+  ego [options] <file>
+
+Options:
+  -v      Show version information
+  -h      Show this help message
+
+Arguments:
+  <file>  Path to the Ego source file to execute
+
+Example:
+  ego my_program.ego`)
 }
 
 func printParserErrors(out io.Writer, parseError *parser.ParseError) {
