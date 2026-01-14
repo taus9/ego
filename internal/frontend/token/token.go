@@ -19,57 +19,56 @@ const (
 	ILLEGAL             = "ILLEGAL"
 	UNTERMINATED_STRING = "UNTERMINATED_STRING"
 
-	EOL = "EOL"
-	EOF = "EOF"
+	EOL = "EOL" // - p
+	EOF = "EOF" // - p
 
 	// Identifiers + literals
-	IDENT  = "IDENT"  // add, foobar, x, y, ...
-	INT    = "INT"    // 1343
-	FLOAT  = "FLOAT"  // 3.14
-	STRING = "STRING" // "foobar"
+	IDENT  = "IDENT"  // add, foobar, x, y, ... - p
+	INT    = "INT"    // 1343 - p
+	FLOAT  = "FLOAT"  // 3.14 - p
+	STRING = "STRING" // "foobar" - p
 
 	// Operators
 
-	ASSIGN   = "="
-	PLUS     = "+"
-	MINUS    = "-"
-	BANG     = "!"
-	ASTERISK = "*"
-	SLASH    = "/"
-	MOD      = "%"
+	ASSIGN   = "=" // - p
+	PLUS     = "+" // - p
+	MINUS    = "-" // - p
+	BANG     = "!" // - p
+	ASTERISK = "*" // - p
+	SLASH    = "/" // - p
+	MOD      = "%" // - p
 
-	LT     = "<"
-	GT     = ">"
-	EQ     = "=="
-	NOT_EQ = "!="
-	LT_EQ  = "<="
-	GT_EQ  = ">="
+	LT     = "<"  // - p
+	GT     = ">"  // - p
+	EQ     = "==" // - p
+	NOT_EQ = "!=" // - p
+	LT_EQ  = "<=" // - p
+	GT_EQ  = ">=" // - p
 
-	COMMA        = ","
-	SINGLE_QUOTE = "'"
-	LBRACKET     = "["
-	RBRACKET     = "]"
+	COMMA        = "," // - p
+	SINGLE_QUOTE = "'" // - p
+	LBRACKET     = "[" // - p
+	RBRACKET     = "]" // - p
 
-	LPAREN = "("
-	RPAREN = ")"
-	LBRACE = "{"
-	RBRACE = "}"
+	LPAREN = "(" // - p
+	RPAREN = ")" // - p
+	LBRACE = "{" // - p
+	RBRACE = "}" // - p
 
-	COLON         = ":"
-	ANON_FUNCTION = ":>"
-	END_BLOCK     = ";"
+	COLON         = ":"  // - p
+	ANON_FUNCTION = ":>" // - p
+	END_BLOCK     = ";"  // - p
 	LET           = ":="
 
-	TRUE   = "TRUE"
-	FALSE  = "FALSE"
-	IF     = "IF"
-	ELSE   = "ELSE"
-	RETURN = "RET"
-	FOR    = "FOR"
-	TO     = "TO"
-	AND    = "AND"
-	OR     = "OR"
-
+	TRUE   = "TRUE"  // - p
+	FALSE  = "FALSE" // - p
+	IF     = "IF"    // - p
+	ELSE   = "ELSE"  // - p
+	RETURN = "RET"   // - p
+	FOR    = "FOR"   // - p
+	TO     = "TO"    // - p
+	AND    = "AND"   // - p
+	OR     = "OR"    // - p
 	// used internally by the parsers
 	LET_INTERNAL   = "$LET"
 	BEGIN_INTERNAL = "$BEGIN"
