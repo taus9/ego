@@ -97,6 +97,7 @@ func TestNextToken(t *testing.T) {
 	x = 3.14
 	y = 0.001
 	z = 10.0
+	x and y or z
 	`
 
 	tests := []struct {
@@ -218,6 +219,12 @@ func TestNextToken(t *testing.T) {
 		{token.IDENT, "z"},
 		{token.ASSIGN, "="},
 		{token.FLOAT, "10.0"},
+		{token.EOL, "\n"},
+		{token.IDENT, "x"},
+		{token.AND, "and"},
+		{token.IDENT, "y"},
+		{token.OR, "or"},
+		{token.IDENT, "z"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}

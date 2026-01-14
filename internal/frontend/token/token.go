@@ -65,6 +65,9 @@ const (
 	RETURN = "RET"
 	FOR    = "FOR"
 	TO     = "TO"
+	AND    = "AND"
+	OR     = "OR"
+
 	// used internally by the parsers
 	LET_INTERNAL   = "$LET"
 	BEGIN_INTERNAL = "$BEGIN"
@@ -78,6 +81,8 @@ var keywords = map[string]TokenType{
 	"ret":   RETURN,
 	"for":   FOR,
 	"to":    TO,
+	"and":   AND,
+	"or":    OR,
 }
 
 func LookupIdent(ident string) TokenType {
