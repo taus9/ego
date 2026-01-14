@@ -1,3 +1,13 @@
-for i = 0 to 9
+for i = 0 to 4
     put(i)
+;
+
+for j = 4 to 0
+    put(j)
+;
+
+k = 0
+for k < 5
+    put(k)
+    k = k + 1
 ;
