@@ -69,6 +69,23 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		env.Set(node.Name.Value, val)
 
+	case *ast.ForWhileStatement:
+		conditionObj := Eval(node.Condition, env)
+		if isError(conditionObj) {
+			return conditionObj
+		}
+
+		for isTruthy(conditionObj) {
+			evalResult := Eval(node.Body, env)
+			if isError(evalResult) {
+				return evalResult
+			}
+			conditionObj = Eval(node.Condition, env)
+			if isError(conditionObj) {
+				return conditionObj
+			}
+		}
+
 	case *ast.ForToStatement:
 		startObj := Eval(node.Start, env)
 		if isError(startObj) {
