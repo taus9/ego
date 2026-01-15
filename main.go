@@ -20,11 +20,11 @@ func main() {
 
 	switch userArgs[0] {
 
-	case "-v":
+	case "version":
 		fmt.Println("ego version 0.1.0")
 		return
 
-	case "-h":
+	case "help":
 		showUsage()
 		return
 
@@ -61,17 +61,15 @@ func run(source string) {
 }
 
 func showUsage() {
-	fmt.Println(`The Ego programming language CLI
+	fmt.Println(`ego programming language
 
 Usage:
-  ego [options] <file>
-
-Options:
-  -v      Show version information
-  -h      Show this help message
+  ego <arguments>
 
 Arguments:
-  <file>  Path to the Ego source file to execute
+  version   Show the version of Ego
+  help      Show this help message
+  <file>    Path to the Ego source file to execute
 
 Example:
   ego my_program.ego`)

@@ -90,7 +90,7 @@ go run main.go
 The CLI supports a couple of options:
 
 ```text
-The Ego programming language CLI
+ego programming language
 
 Usage:
   ego [options] <file>
@@ -134,7 +134,7 @@ go test ./...
 
 ## Background & Motivation
 
-Ego started as a modification and extension of the Monkey programming language from Thorston Ball’s book *Writing an Interpreter in Go*. From that base, it adds and tweaks features (such as additional operators, `for` loops, floats, and richer error reporting) to experiment with language design and interpreter architecture.
+Ego started as an exploration of Thorston Ball’s book *Writing an Interpreter in Go* (really good).
 
 The project is intended as a readable, educational codebase that demonstrates:
 
