@@ -72,7 +72,7 @@ func (l *Lexer) NextToken() token.Token {
 			ch := l.ch
 			l.readChar()
 			literal := string(ch) + string(l.ch)
-			tok = token.Token{Type: token.LET, Literal: literal}
+			tok = token.Token{Type: token.DECLARE, Literal: literal}
 			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
 		} else {
 			tok = l.newToken(token.COLON, l.ch)

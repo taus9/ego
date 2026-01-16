@@ -58,7 +58,7 @@ const (
 	COLON         = ":"  // - p
 	ANON_FUNCTION = ":>" // - p
 	END_BLOCK     = ";"  // - p
-	LET           = ":="
+	DECLARE       = ":="
 
 	TRUE   = "TRUE"  // - p
 	FALSE  = "FALSE" // - p

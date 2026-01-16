@@ -1,0 +1,20 @@
+:find_sum root
+    if root == nil
+        ret 0
+    ;
+
+    ret root['value'] + find_sum(root['left']) + find_sum(root['right'])
+;
+
+
+node_five = {'value': 5, 'left': nil, 'right': nil}
+node_six  = {'value': 6, 'left': nil, 'right': nil}
+
+node_three = {'value': 3, 'left': node_five, 'right': node_six}
+node_four = {'value': 4, 'left': nil, 'right': nil}
+
+node_two = {'value': 2, 'left': node_three, 'right': node_four}
+
+sum = find_sum(node_two)
+
+put('The sum is ' + str(sum))

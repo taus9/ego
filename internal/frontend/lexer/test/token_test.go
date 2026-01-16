@@ -36,6 +36,7 @@ func TestNextToken(t *testing.T) {
 	x and y or z
 	x <= y
 	y >= z
+	a := 42
 	`
 
 	tests := []struct {
@@ -171,6 +172,10 @@ func TestNextToken(t *testing.T) {
 		{token.IDENT, "y"},
 		{token.GT_EQ, ">="},
 		{token.IDENT, "z"},
+		{token.EOL, "\n"},
+		{token.IDENT, "a"},
+		{token.DECLARE, ":="},
+		{token.INT, "42"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}
