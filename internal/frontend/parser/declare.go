@@ -5,13 +5,13 @@ import (
 	"ego/internal/frontend/token"
 )
 
-func (p *Parser) parseLetStatement() *ast.LetStatement {
-	p.stackTrace.Push(LET)
-	stmt := &ast.LetStatement{Token: token.Token{Type: token.LET_INTERNAL, Literal: token.LET_INTERNAL}}
+func (p *Parser) parseDeclareStatement() *ast.DeclareStatement {
+	p.stackTrace.Push(DECLARE)
+	stmt := &ast.DeclareStatement{Token: token.Token{Type: token.DECLARE, Literal: token.DECLARE_INTERNAL}}
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 	p.nextToken() // consume indentifier
-	p.nextToken() // consume '='
+	p.nextToken() // consume ':='
 
 	stmt.Value = p.parseExpression(LOWEST)
 	if p.errorExist() {

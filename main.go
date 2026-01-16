@@ -115,8 +115,8 @@ func stackTraceItemToString(item int) string {
 		return "BLOCK"
 	case parser.IF:
 		return "IF"
-	case parser.LET:
-		return "LET"
+	case parser.DECLARE:
+		return "DECLARE"
 	case parser.RETURN:
 		return "RETURN"
 	case parser.MAP:

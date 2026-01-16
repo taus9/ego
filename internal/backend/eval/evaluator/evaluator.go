@@ -69,7 +69,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return evalInfixExpression(node.Operator, left, right)
 
-	case *ast.LetStatement:
+	case *ast.DeclareStatement:
 		currentToken = node.Token
 		if isReservedWord(node.Name.Value) {
 

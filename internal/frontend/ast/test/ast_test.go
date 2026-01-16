@@ -9,8 +9,8 @@ import (
 func TestString(t *testing.T) {
 	program := &ast.Program{
 		Statements: []ast.Statement{
-			&ast.LetStatement{
-				Token: token.Token{Type: token.LET_INTERNAL, Literal: "$LET"},
+			&ast.DeclareStatement{
+				Token: token.Token{Type: token.DECLARE_INTERNAL, Literal: "$LET"},
 				Name: &ast.Identifier{
 					Token: token.Token{Type: token.IDENT, Literal: "myVar"},
 					Value: "myVar",

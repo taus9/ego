@@ -1,17 +1,17 @@
 :fizzbuzz n
-    for i = 1 to n 
-        printed = false
+    for i := 1 to n 
+        printed := false
         if i % 15 == 0
             put('FizzBuzz')
-            printed = true
+            printed := true
         ;
         if i % 3 == 0 and !printed
             put('Fizz')
-            printed = true
+            printed := true
         ;
         if i % 5 == 0 and !printed
             put('Buzz')
-            printed = true
+            printed := true
         ;
         if !printed
             put(i)

@@ -7,15 +7,15 @@ import (
 	"testing"
 )
 
-func TestLetStatements(t *testing.T) {
+func TestDeclareStatements(t *testing.T) {
 	tests := []struct {
 		input              string
 		expectedIdentifier string
 		expectedValue      any
 	}{
-		{"x = 5", "x", 5},
-		{"y = true", "y", true},
-		{"foobar = y", "foobar", "y"},
+		{"x := 5", "x", 5},
+		{"y := true", "y", true},
+		{"foobar := y", "foobar", "y"},
 	}
 	for _, tt := range tests {
 		l := lexer.New(tt.input)
@@ -29,32 +29,32 @@ func TestLetStatements(t *testing.T) {
 		}
 
 		stmt := program.Statements[0]
-		if !testLetStatements(t, stmt, tt.expectedIdentifier) {
+		if !testDeclareStatements(t, stmt, tt.expectedIdentifier) {
 			return
 		}
 
-		val := stmt.(*ast.LetStatement).Value
+		val := stmt.(*ast.DeclareStatement).Value
 		if !testLiteralExpression(t, val, tt.expectedValue) {
 			return
 		}
 	}
 }
 
-func testLetStatements(t *testing.T, s ast.Statement, name string) bool {
-	if s.TokenLiteral() != "$LET" {
-		t.Errorf("s.TokenLiteral not '$LET'. got=%q", s.TokenLiteral())
+func testDeclareStatements(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "$DECLARE" {
+		t.Errorf("s.TokenLiteral not '$DECLARE'. got=%q", s.TokenLiteral())
 		return false
 	}
 
-	letStmt, ok := s.(*ast.LetStatement)
+	declareStmt, ok := s.(*ast.DeclareStatement)
 	if !ok {
-		t.Errorf("s not *ast.LetStatement. got=%T", s)
+		t.Errorf("s not *ast.DeclareStatement. got=%T", s)
 		return false
 	}
 
-	if letStmt.Name.Value != name {
-		t.Errorf("letStmt.Name.TokenLiteral() not '%s'. got=%s",
-			name, letStmt.Name.TokenLiteral())
+	if declareStmt.Name.Value != name {
+		t.Errorf("declareStmt.Name.TokenLiteral() not '%s'. got=%s",
+			name, declareStmt.Name.TokenLiteral())
 		return false
 	}
 

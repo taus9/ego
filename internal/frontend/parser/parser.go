@@ -14,7 +14,7 @@ const (
 	ARRAY
 	BLOCK
 	IF
-	LET
+	DECLARE
 	RETURN
 	MAP
 	CALL_ARGS
@@ -101,6 +101,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.EOL, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.EOF, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.ASSIGN, p.parseUnexpectedTokenError)
+	p.registerPrefix(token.DECLARE, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.PLUS, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.ASTERISK, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.SLASH, p.parseUnexpectedTokenError)
@@ -189,8 +190,8 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.IDENT:
-		if p.peekTokenIs(token.ASSIGN) {
-			return p.parseLetStatement()
+		if p.peekTokenIs(token.DECLARE) {
+			return p.parseDeclareStatement()
 		}
 		return p.parseExpressionStatement()
 

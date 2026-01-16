@@ -5,19 +5,19 @@ import (
 	"ego/internal/frontend/token"
 )
 
-type LetStatement struct {
+type DeclareStatement struct {
 	Token token.Token // the token.LET token
 	Name  *Identifier
 	Value Expression
 }
 
-func (ls *LetStatement) statementNode() {}
+func (ls *DeclareStatement) statementNode() {}
 
-func (ls *LetStatement) TokenLiteral() string {
+func (ls *DeclareStatement) TokenLiteral() string {
 	return ls.Token.Literal
 }
 
-func (ls *LetStatement) String() string {
+func (ls *DeclareStatement) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(ls.TokenLiteral() + " ")

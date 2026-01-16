@@ -70,8 +70,8 @@ const (
 	AND    = "AND"   // - p
 	OR     = "OR"    // - p
 	// used internally by the parsers
-	LET_INTERNAL   = "$LET"
-	BEGIN_INTERNAL = "$BEGIN"
+	DECLARE_INTERNAL = "$DECLARE"
+	BEGIN_INTERNAL   = "$BEGIN"
 )
 
 var keywords = map[string]TokenType{

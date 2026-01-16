@@ -17,7 +17,7 @@ func (p *Parser) parseForStatement() ast.Statement {
 	p.stackTrace.Push(FOR)
 	p.nextToken() // consume 'for' token
 
-	if p.curTokenIs(token.IDENT) && p.peekTokenIs(token.ASSIGN) {
+	if p.curTokenIs(token.IDENT) && p.peekTokenIs(token.DECLARE) {
 		return p.parseForToStatement()
 	}
 
@@ -26,7 +26,7 @@ func (p *Parser) parseForStatement() ast.Statement {
 
 func (p *Parser) parseForWhileStatement() *ast.ForWhileStatement {
 	fws := &ast.ForWhileStatement{Token: token.Token{Type: token.FOR, Literal: "for"}}
-	
+
 	condition := p.parseExpression(LOWEST)
 
 	if p.errorExist() {
@@ -62,13 +62,12 @@ func (p *Parser) parseForToStatement() *ast.ForToStatement {
 	p.nextToken() // consume identifier
 
 	// redundant check
-	if !p.curTokenIs(token.ASSIGN) {
-		p.createErrorMessage("expected '=' after for index identifier")
+	if !p.curTokenIs(token.DECLARE) {
+		p.createErrorMessage("expected ':=' after for index identifier")
 		return nil
 	}
 
-	p.nextToken() // consume '=' token
-
+	p.nextToken() // consume ':=' token
 	fts.Start = p.parseExpression(LOWEST)
 
 	if p.errorExist() {

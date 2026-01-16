@@ -8,7 +8,7 @@ import (
 )
 
 func TestParsingForWhileStatement(t *testing.T) {
-	input := "for i < 5 \n i = i + 1 \n ;"
+	input := "for i < 5 \n i := i + 1 \n ;"
 
 	l := lexer.New(input)
 	p := parser.New(l)
@@ -35,7 +35,7 @@ func TestParsingForWhileStatement(t *testing.T) {
 			len(stmt.Body.Statements))
 	}
 
-	bodyStmt, ok := stmt.Body.Statements[0].(*ast.LetStatement)
+	bodyStmt, ok := stmt.Body.Statements[0].(*ast.DeclareStatement)
 	if !ok {
 		t.Fatalf("function body stmt is not ast.LetStatement. got=%T",
 			stmt.Body.Statements[0])
