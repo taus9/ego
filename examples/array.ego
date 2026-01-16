@@ -1,0 +1,20 @@
+# ego version 0.1.0
+
+# declare an empty array
+myEmptyArray := []
+put(myEmptyArray)
+
+# declare an array with initial values
+myArray := [1, 2, 3, 4, 5]
+put(myArray)
+
+# access array elements
+firstElement := myArray[0]
+put(firstElement)
+
+secondElement := myArray[1]
+put(secondElement)
+
+# modify array elements
+myArray[2] = 10
+put(myArray)
