@@ -20,6 +20,7 @@ const (
 	CALL_ARGS
 	FUNC
 	FOR
+	ASSIGN
 )
 
 const (
@@ -69,6 +70,8 @@ type Parser struct {
 
 	blockStack *Stack
 	stackTrace *Stack
+
+	currentExpression *ast.Expression
 
 	prefixParseFns map[token.TokenType]prefixParseFn
 	infixParseFns  map[token.TokenType]infixParseFn
@@ -193,8 +196,14 @@ func (p *Parser) parseStatement() ast.Statement {
 		if p.peekTokenIs(token.DECLARE) {
 			return p.parseDeclareStatement()
 		}
-		return p.parseExpressionStatement()
 
+		exp := p.parseExpressionStatement()
+		if p.peekTokenIs(token.ASSIGN) && p.isAssignableExpression(exp) {
+			p.nextToken() // jump to '=' token
+			return p.parseAssignStatement(exp.Expression)
+		}
+
+		return exp
 	case token.COLON:
 		return p.parseFunctionStatement()
 
@@ -257,4 +266,19 @@ func (p *Parser) parseUnexpectedTokenError() ast.Expression {
 
 func (p *Parser) errorExist() bool {
 	return p.parseError != nil
+}
+
+func (p *Parser) isAssignableExpression(exp *ast.ExpressionStatement) bool {
+	// currently only support for one dimensional index expressions
+	switch node := exp.Expression.(type) {
+	case *ast.Identifier:
+		return true
+	case *ast.IndexExpression:
+		if _, ok := node.Left.(*ast.Identifier); !ok {
+			return false
+		}
+		return true
+	default:
+		return false
+	}
 }

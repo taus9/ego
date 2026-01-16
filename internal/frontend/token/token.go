@@ -70,6 +70,7 @@ const (
 	AND    = "AND"   // - p
 	OR     = "OR"    // - p
 	// used internally by the parsers
+	ASSIGN_INTERNAL  = "$ASSIGN"
 	DECLARE_INTERNAL = "$DECLARE"
 	BEGIN_INTERNAL   = "$BEGIN"
 )
