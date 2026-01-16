@@ -38,6 +38,7 @@ func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
 	l.skipWhitespace()
+	l.skipComment()
 
 	switch l.ch {
 
@@ -241,4 +242,12 @@ func (l *Lexer) readString() (string, error) {
 	}
 
 	return l.input[position:l.position], err
+}
+
+func (l *Lexer) skipComment() {
+	if l.ch == '#' {
+		for l.ch != '\n' && l.ch != 0 {
+			l.readChar()
+		}
+	}
 }
