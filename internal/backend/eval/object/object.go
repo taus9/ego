@@ -109,6 +109,14 @@ func (e *Environment) Set(name string, val Object) Object {
 	return val
 }
 
+func (e *Environment) Exists(name string) bool {
+	_, ok := e.store[name]
+	if !ok && e.outer != nil {
+		return e.outer.Exists(name)
+	}
+	return ok
+}
+
 type Function struct {
 	Parameters []*ast.Identifier
 	Body       *ast.BlockStatement
