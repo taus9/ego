@@ -83,6 +83,61 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 		env.Set(node.Name.Value, val)
 
+	case *ast.AssignStatement:
+		currentToken = node.Token
+		var assignName string
+		if node.Name != nil {
+			assignName = node.Name.Value
+			if !env.Exists(assignName) {
+				return newError("identifier not declared: %s", assignName)
+			}
+
+			val := Eval(node.Value, env)
+			if isError(val) {
+				return val
+			}
+			env.Set(assignName, val)
+
+		} else if node.Index != nil {
+			indexExp, ok := node.Index.(*ast.IndexExpression)
+			if !ok {
+				return newError("invalid assignment target")
+			}
+			assignName = indexExp.Left.(*ast.Identifier).Value
+
+			if !env.Exists(assignName) {
+				return newError("identifier not declared: %s", assignName)
+			}
+
+			indexObj := Eval(indexExp.Index, env)
+			if isError(indexObj) {
+				return indexObj
+			}
+			leftObj := Eval(indexExp.Left, env)
+			if isError(leftObj) {
+				return leftObj
+			}
+			arrayObj, ok := leftObj.(*object.Array)
+			if !ok {
+				return newError("assignment target is not an array")
+			}
+			indexInt, ok := indexObj.(*object.Integer)
+			if !ok {
+				return newError("array index must be an integer")
+			}
+			if indexInt.Value < 0 || indexInt.Value >= int64(len(arrayObj.Elements)) {
+				return newError("array index out of bounds")
+			}
+			valueObj := Eval(node.Value, env)
+			if isError(valueObj) {
+				return valueObj
+			}
+			arrayObj.Elements[indexInt.Value] = valueObj
+			env.Set(assignName, arrayObj)
+		} else {
+			return newError("invalid assignment target")
+		}
+
 	case *ast.ForWhileStatement:
 		currentToken = node.Token
 		conditionObj := Eval(node.Condition, env)
