@@ -1,11 +1,18 @@
+# ego version 0.1.0
+
+# there are three types of for loops in ego
+
+# 1. counting loop: for i := start to end
 for i := 0 to 4
     put(i)
 ;
 
+# 2. reverse counting loop: for i := end to start
 for j := 4 to 0
     put(j)
 ;
 
+# 3. conditional loop: for condition
 k := 0
 for k < 5
     put(k)
