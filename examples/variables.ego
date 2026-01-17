@@ -1,0 +1,30 @@
+# ego version 0.1.0
+
+# variables are decalred using the := operator
+x := 10
+y := 20
+put('x = ' + str(x) + ', y = ' + str(y))
+
+# variables can be reassigned using the = operator
+x = 15
+y = 25
+put('After reassignment: x = ' + str(x) + ', y = ' + str(y))
+
+# variables can hold different types of values
+name := 'Ego'
+isAwesome := true
+put('Name: ' + name + ', isAwesome: ' + str(isAwesome))
+
+# variables can be used in expressions
+sum := x + y
+put('Sum of x and y: ' + str(sum))
+
+# variables can be used in functions
+greet := 'Hello, ' + name + '!'
+put(greet)
+
+# variables have scope within functions
+:printValues a, b
+    put('Inside function: a = ' + str(a) + ', b = ' + str(b))
+;
+printValues(x, y)
