@@ -1,6 +1,6 @@
 # ego version 0.1.0
 
-# there are three types of for loops in ego
+# there are four types of for loops in ego
 
 # 1. counting loop: for i := start to end (inclusive)
 for i := 0 to 4
@@ -16,5 +16,21 @@ for j := 4 to 0
 k := 0
 for k < 5
     put(k)
-    k := k + 1
+    k = k + 1
+;
+
+# 4. iterating over arrays, the first variable is the index, the second is the value
+arr := [10, 20, 30, 40, 50]
+for index, value in arr
+    put('Index: ' + str(index) + ', Value: ' + str(value))
+;
+
+# 5. iterating over maps, the first variable is the key, the second is the value
+m := {
+    'a': 1,
+    'b': 2,
+    'c': 3
+}
+for key, val in m
+    put('Key: ' + key + ', Value: ' + str(val))
 ;
