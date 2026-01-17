@@ -7,6 +7,14 @@ import (
 )
 
 var builtins = map[string]*object.Builtin{
+	"put": {
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+			return NIL
+		},
+	},
 
 	"len": {
 		Fn: func(args ...object.Object) object.Object {
@@ -43,15 +51,6 @@ var builtins = map[string]*object.Builtin{
 			newElements[length] = args[1]
 
 			return &object.Array{Elements: newElements}
-		},
-	},
-
-	"put": {
-		Fn: func(args ...object.Object) object.Object {
-			for _, arg := range args {
-				fmt.Println(arg.Inspect())
-			}
-			return NIL
 		},
 	},
 
