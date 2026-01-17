@@ -169,10 +169,14 @@ func (l *Lexer) NextToken() token.Token {
 
 func (l *Lexer) readIdentifier() string {
 	position := l.position
-	for isLetter(l.ch) {
+	for isLetterOrDigit(l.ch) {
 		l.readChar()
 	}
 	return l.input[position:l.position]
+}
+
+func isLetterOrDigit(ch byte) bool {
+	return isLetter(ch) || isDigit(ch)
 }
 
 func isLetter(ch byte) bool {

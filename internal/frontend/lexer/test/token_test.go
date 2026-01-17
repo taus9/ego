@@ -10,6 +10,8 @@ func TestNextToken(t *testing.T) {
 	input := `
 	five = 5
 	ten = 10
+	five2 = 50
+	ten_3 = 100
 	add = :> x, y
 		x + y
 	;
@@ -51,6 +53,14 @@ func TestNextToken(t *testing.T) {
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
 		{token.INT, "10"},
+		{token.EOL, "\n"},
+		{token.IDENT, "five2"},
+		{token.ASSIGN, "="},
+		{token.INT, "50"},
+		{token.EOL, "\n"},
+		{token.IDENT, "ten_3"},
+		{token.ASSIGN, "="},
+		{token.INT, "100"},
 		{token.EOL, "\n"},
 		{token.IDENT, "add"},
 		{token.ASSIGN, "="},
