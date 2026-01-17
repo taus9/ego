@@ -1,3 +1,6 @@
+# ego version 0.1.0
+# this example demonstrates the classic FizzBuzz problem
+
 :fizzbuzz n
     for i := 1 to n 
         printed := false
