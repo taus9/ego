@@ -43,3 +43,12 @@ func (s *Stack) Size() int {
 func (s *Stack) Elements() []any {
 	return s.elements
 }
+
+func (s *Stack) Has(t any) bool {
+	for _, e := range s.elements {
+		if e == t {
+			return true
+		}
+	}
+	return false
+}

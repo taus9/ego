@@ -215,6 +215,20 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.FOR:
 		return p.parseForStatement()
 
+	case token.BREAK:
+		if !p.stackTrace.Has(FOR) {
+			p.createErrorMessage("break statement not within a for loop")
+			return nil
+		}
+		return p.parseBreakStatement()
+
+	case token.AGAIN:
+		if !p.stackTrace.Has(FOR) {
+			p.createErrorMessage("again statement not within a for loop")
+			return nil
+		}
+		return p.parseAgainStatement()
+
 	case token.EOL:
 		return nil
 
