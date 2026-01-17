@@ -33,8 +33,9 @@
 ;
 
 arr := [10, 7, 8, 9, 1, 5]
-n := len(arr)
+put('Unsorted array: ' + join(arr, ', '))
 
+n := len(arr)
 quicksort(arr, 0, n - 1)
 
-put('Sorted array: ' + join(arr, ', '))
+put('Sorted array:   ' + join(arr, ', '))
