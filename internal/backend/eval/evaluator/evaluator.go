@@ -192,6 +192,36 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			}
 		}
 
+	case *ast.ForInStatement:
+		currentToken = node.Token
+		iterableObj := Eval(node.Iterable, env)
+		if isError(iterableObj) {
+			return iterableObj
+		}
+
+		switch iterable := iterableObj.(type) {
+		case *object.Array:
+			for idx, element := range iterable.Elements {
+				env.Set(node.Index.Value, &object.Integer{Value: int64(idx)})
+				env.Set(node.Value.Value, element)
+				evalResult := Eval(node.Body, env)
+				if isError(evalResult) {
+					return evalResult
+				}
+			}
+		case *object.Map:
+			for _, pair := range iterable.Pairs {
+				env.Set(node.Index.Value, pair.Key)
+				env.Set(node.Value.Value, pair.Value)
+				evalResult := Eval(node.Body, env)
+				if isError(evalResult) {
+					return evalResult
+				}
+			}
+		default:
+			return newError("cannot iterate over type: %s", iterableObj.Type())
+		}
+
 	case *ast.FunctionStatement:
 		currentToken = node.Token
 		function := &object.Function{Parameters: node.Parameters, Body: node.Body, Env: env}
