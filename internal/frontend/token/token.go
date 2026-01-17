@@ -67,6 +67,7 @@ const (
 	RETURN = "RET"   // - p
 	FOR    = "FOR"   // - p
 	TO     = "TO"    // - p
+	IN     = "IN"    // - p
 	AND    = "AND"   // - p
 	OR     = "OR"    // - p
 	// used internally by the parsers
@@ -83,6 +84,7 @@ var keywords = map[string]TokenType{
 	"ret":   RETURN,
 	"for":   FOR,
 	"to":    TO,
+	"in":    IN,
 	"and":   AND,
 	"or":    OR,
 }

@@ -39,6 +39,8 @@ func TestNextToken(t *testing.T) {
 	x <= y
 	y >= z
 	a := 42
+	for i, v in myArray
+	;
 	`
 
 	tests := []struct {
@@ -186,6 +188,15 @@ func TestNextToken(t *testing.T) {
 		{token.IDENT, "a"},
 		{token.DECLARE, ":="},
 		{token.INT, "42"},
+		{token.EOL, "\n"},
+		{token.FOR, "for"},
+		{token.IDENT, "i"},
+		{token.COMMA, ","},
+		{token.IDENT, "v"},
+		{token.IN, "in"},
+		{token.IDENT, "myArray"},
+		{token.EOL, "\n"},
+		{token.END_BLOCK, ";"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}
