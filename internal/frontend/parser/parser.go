@@ -127,6 +127,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.AND, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.OR, p.parseUnexpectedTokenError)
 
+	p.registerPrefix(token.ILLEGAL, p.parseIllegalTokenError)
+
 	p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
 	p.registerPrefix(token.ELSE, p.parseElseExpression)
 
@@ -261,6 +263,11 @@ func (p *Parser) createErrorMessage(messsage string) {
 
 func (p *Parser) parseUnexpectedTokenError() ast.Expression {
 	p.createErrorMessage(fmt.Sprintf("unexpected token: %s", p.curToken.Type))
+	return nil
+}
+
+func (p *Parser) parseIllegalTokenError() ast.Expression {
+	p.createErrorMessage(fmt.Sprintf("illegal token: %s", p.curToken.Literal))
 	return nil
 }
 
