@@ -15,9 +15,8 @@ var reservedWords = []string{
 var currentToken token.Token
 
 var (
-	NIL  = &object.Nil{}
-	TRUE = &object.Boolean{
-		Value: true}
+	NIL   = &object.Nil{}
+	TRUE  = &object.Boolean{Value: true}
 	FALSE = &object.Boolean{Value: false}
 )
 
@@ -87,6 +86,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		currentToken = node.Token
 		var assignName string
 		if node.Name != nil {
+			// simple variable assignment
 			assignName = node.Name.Value
 			if !env.Exists(assignName) {
 				return newError("identifier not declared: %s", assignName)
@@ -99,6 +99,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			env.Set(assignName, val)
 
 		} else if node.Index != nil {
+			// array index assignment
 			indexExp, ok := node.Index.(*ast.IndexExpression)
 			if !ok {
 				return newError("invalid assignment target")
@@ -585,7 +586,7 @@ func evalArrayIndexExpression(array, index object.Object) object.Object {
 	max := int64(len(arrayObject.Elements) - 1)
 
 	if idx < 0 || idx > max {
-		return NIL
+		return newError("array index out of bounds: %d", idx)
 	}
 
 	return arrayObject.Elements[idx]
