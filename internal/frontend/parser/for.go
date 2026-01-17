@@ -21,6 +21,10 @@ func (p *Parser) parseForStatement() ast.Statement {
 		return p.parseForToStatement()
 	}
 
+	if p.curTokenIs(token.IDENT) && p.peekTokenIs(token.COMMA) {
+		return p.parseForInStatement()
+	}
+
 	return p.parseForWhileStatement()
 }
 
@@ -108,4 +112,54 @@ func (p *Parser) parseForToStatement() *ast.ForToStatement {
 	//END BLOCK token already consumed in parseBlockStatement
 	p.stackTrace.Pop()
 	return fts
+}
+
+func (p *Parser) parseForInStatement() *ast.ForInStatement {
+	fis := &ast.ForInStatement{Token: token.Token{Type: token.FOR, Literal: "for"}}
+	fis.Index = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	p.nextToken() // consume index identifier
+	p.nextToken() // consume ',' token
+
+	if !p.curTokenIs(token.IDENT) {
+		p.createErrorMessage("expected identifier after ',' in for in statement")
+		return nil
+	}
+
+	fis.Value = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	p.nextToken() // consume value identifier
+
+	if !p.curTokenIs(token.IN) {
+		p.createErrorMessage("expected 'in' after for in value identifier")
+		return nil
+	}
+
+	p.nextToken() // consume 'in' token
+
+	fis.Iterable = p.parseExpression(LOWEST)
+
+	if p.errorExist() {
+		return nil
+	}
+
+	p.nextToken()
+
+	if !p.curTokenIs(token.EOL) {
+		p.createErrorMessage("expected EOL after for in iterable expression")
+		return nil
+	}
+
+	p.blockStack.Push(token.FOR)
+	fis.Body = p.parseBlockStatement()
+
+	if p.errorExist() {
+		return nil
+	}
+
+	p.blockStack.Pop()
+
+	//END BLOCK token already consumed in parseBlockStatement
+	p.stackTrace.Pop()
+	return fis
 }

@@ -58,3 +58,33 @@ func (fws *ForWhileStatement) String() string {
 
 	return out.String()
 }
+
+type ForInStatement struct {
+	Token    token.Token
+	Index    *Identifier
+	Value    *Identifier
+	Iterable Expression
+	Body     *BlockStatement
+}
+
+func (fis *ForInStatement) statementNode() {}
+
+func (fis *ForInStatement) TokenLiteral() string {
+	return fis.Token.Literal
+}
+
+func (fis *ForInStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(fis.TokenLiteral())
+	out.WriteString(" ")
+	out.WriteString(fis.Index.String())
+	out.WriteString(", ")
+	out.WriteString(fis.Value.String())
+	out.WriteString(" in ")
+	out.WriteString(fis.Iterable.String())
+	out.WriteString(" ")
+	out.WriteString(fis.Body.String())
+
+	return out.String()
+}

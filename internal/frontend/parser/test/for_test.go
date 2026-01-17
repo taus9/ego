@@ -96,3 +96,55 @@ func TestParsingForToStatement(t *testing.T) {
 		return
 	}
 }
+
+func TestParsingForInStatement(t *testing.T) {
+	input := "for i, v in myArray \n ret v \n ;"
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
+			1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ForInStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ForInStatement. got=%T",
+			program.Statements[0])
+	}
+
+	if stmt.Index.Value != "i" {
+		t.Errorf("index is not 'i'. got=%s", stmt.Index.Value)
+	}
+
+	if stmt.Value.Value != "v" {
+		t.Errorf("value is not 'v'. got=%s", stmt.Value.Value)
+	}
+
+	iterable, ok := stmt.Iterable.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("stmt.Iterable is not ast.Identifier. got=%T", stmt.Iterable)
+	}
+
+	if iterable.Value != "myArray" {
+		t.Errorf("iterable is not 'myArray'. got=%s", iterable.Value)
+	}
+
+	if len(stmt.Body.Statements) != 1 {
+		t.Fatalf("function.Body.Statements has not 1 statements. got=%d\n",
+			len(stmt.Body.Statements))
+	}
+
+	bodyStmt, ok := stmt.Body.Statements[0].(*ast.ReturnStatement)
+	if !ok {
+		t.Fatalf("function body stmt is not ast.ReturnStatement. got=%T",
+			stmt.Body.Statements[0])
+	}
+
+	if !testIdentifier(t, bodyStmt.ReturnValue, "v") {
+		return
+	}
+}
