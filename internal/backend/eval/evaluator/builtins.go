@@ -151,33 +151,4 @@ var builtins = map[string]*object.Builtin{
 			return &object.String{Value: result.String()}
 		},
 	},
-
-	"change": {
-		Fn: func(args ...object.Object) object.Object {
-			if len(args) != 3 {
-				return newError("wrong number of arguments. got=%d, want=3", len(args))
-			}
-
-			if args[0].Type() != object.ARRAY_OBJ {
-				return newError("first argument to 'change' must be ARRAY, got %s", args[0].Type())
-			}
-
-			array := args[0].(*object.Array)
-
-			if args[1].Type() != object.INTEGER_OBJ {
-				return newError("second argument to 'change' must be INTEGER, got %s", args[1].Type())
-			}
-
-			index := args[1].(*object.Integer).Value
-			if index > int64(len(array.Elements)-1) || index < 0 {
-				return newError("index out of bounds: %d for array of length %d", index, len(array.Elements))
-			}
-
-			newElements := make([]object.Object, len(array.Elements))
-			copy(newElements, array.Elements)
-			newElements[index] = args[2]
-
-			return &object.Array{Elements: newElements}
-		},
-	},
 }
