@@ -272,7 +272,8 @@ func InitReservedValues(env *object.Environment) {
 }
 
 func isReservedWord(word string) bool {
-	return slices.Contains(reservedWords, word)
+	_, ok := builtins[word]
+	return slices.Contains(reservedWords, word) || ok
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {

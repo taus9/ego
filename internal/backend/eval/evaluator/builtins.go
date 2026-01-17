@@ -7,6 +7,7 @@ import (
 )
 
 var builtins = map[string]*object.Builtin{
+
 	"len": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
@@ -51,6 +52,51 @@ var builtins = map[string]*object.Builtin{
 				fmt.Println(arg.Inspect())
 			}
 			return NIL
+		},
+	},
+
+	"float": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+			switch arg := args[0].(type) {
+			case *object.Integer:
+				return &object.Float{Value: float64(arg.Value)}
+			case *object.Float:
+				return arg
+			case *object.String:
+				var floatValue float64
+				_, err := fmt.Sscanf(arg.Value, "%f", &floatValue)
+				if err != nil {
+					return newError("cannot convert string to float: %s", arg.Value)
+				}
+				return &object.Float{Value: floatValue}
+			default:
+				return newError("argument to 'float' not supported, got %s", args[0].Type())
+			}
+		},
+	},
+	"int": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+			switch arg := args[0].(type) {
+			case *object.Integer:
+				return arg
+			case *object.Float:
+				return &object.Integer{Value: int64(arg.Value)}
+			case *object.String:
+				var intValue int64
+				_, err := fmt.Sscanf(arg.Value, "%d", &intValue)
+				if err != nil {
+					return newError("cannot convert string to int: %s", arg.Value)
+				}
+				return &object.Integer{Value: intValue}
+			default:
+				return newError("argument to 'int' not supported, got %s", args[0].Type())
+			}
 		},
 	},
 

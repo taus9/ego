@@ -1,0 +1,60 @@
+# ego version 0.1.0
+
+# everything in ego is an object and every object has a type
+# variable types are inferred automatically based on the assigned value
+
+# basic types in ego include:
+# - Integer: whole numbers
+# - Float: decimal numbers
+# - String: sequences of characters
+# - Boolean: true or false values
+# - Nil: represents the absence of a value
+
+int_value := 42
+float_value := 3.14
+str_value := 'Hello, Ego!'
+bool_value := true
+nil_value := nil
+
+# there are also complex types like:
+# - Arrays: ordered collections of objects
+# - Maps: key-value pairs for storing related data
+
+arr := [1, 2, 3, 4, 5]
+map := {'name': 'Ego', 'version': 0.1}
+
+# you can check the type of a variable using the type function
+# the type function returns a string representing the type of the object
+put('Type of int_value: ' + type(int_value))       # Output: Integer
+put('Type of float_value: ' + type(float_value))       # Output: Float
+put('Type of str_value: ' + type(str_value))       # Output: String
+put('Type of bool_value: ' + type(bool_value))     # Output: Boolean
+put('Type of nil_value: ' + type(nil_value)) # Output: Nil
+put('Type of arr: ' + type(arr))       # Output: Array
+put('Type of map: ' + type(map))       # Output: Map
+
+# ego supports type casting between compatible types
+# for example, you can convert an integer to a float and vice versa
+# # you can convert number types to strings using the str function
+int_to_float := float(int_value)
+float_to_int := int(float_value)
+num_str := str(int_to_float)
+
+put('Integer to Float: ' + num_str) # Output: 42.0
+# array values can be of mixed types
+# and can be accessed using zero-based indexing
+mixed_arr := [1, 'two', 3.0, true]
+put('First element of mixed_arr: ' + str(mixed_arr[0])) # Output: 1
+put('Second element of mixed_arr: ' + mixed_arr[1]) # Output: two
+put('Third element of mixed_arr: ' + str(mixed_arr[2])) # Output: 3.0
+put('Fourth element of mixed_arr: ' + str(mixed_arr[3])) # Output: true
+
+# map values can be accessed using their keys
+put('Name from map: ' + map['name']) # Output: Ego
+put('Version from map: ' + str(map['version'])) # Output: 0.1
+
+# map keys can be of string, interger, boolean types
+mixed_map := { 'age': 5, 10: 'ten', true: 'boolean key' }
+put('Age from mixed_map: ' + str(mixed_map['age'])) # Output: 5
+put('Value for key 10 from mixed_map: ' + mixed_map[10]) # Output: ten
+put('Value for key true from mixed_map: ' + mixed_map[true]) # Output: boolean key
