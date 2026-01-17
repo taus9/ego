@@ -40,6 +40,8 @@ func TestNextToken(t *testing.T) {
 	y >= z
 	a := 42
 	for i, v in myArray
+	break
+	again
 	;
 	`
 
@@ -195,6 +197,10 @@ func TestNextToken(t *testing.T) {
 		{token.IDENT, "v"},
 		{token.IN, "in"},
 		{token.IDENT, "myArray"},
+		{token.EOL, "\n"},
+		{token.BREAK, "break"},
+		{token.EOL, "\n"},
+		{token.AGAIN, "again"},
 		{token.EOL, "\n"},
 		{token.END_BLOCK, ";"},
 		{token.EOL, "\n"},

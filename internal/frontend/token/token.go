@@ -70,6 +70,9 @@ const (
 	IN     = "IN"    // - p
 	AND    = "AND"   // - p
 	OR     = "OR"    // - p
+	BREAK  = "BREAK" // - p
+	AGAIN  = "AGAIN" // - p
+
 	// used internally by the parsers
 	ASSIGN_INTERNAL  = "$ASSIGN"
 	DECLARE_INTERNAL = "$DECLARE"
@@ -87,6 +90,8 @@ var keywords = map[string]TokenType{
 	"in":    IN,
 	"and":   AND,
 	"or":    OR,
+	"break": BREAK,
+	"again": AGAIN,
 }
 
 func LookupIdent(ident string) TokenType {
