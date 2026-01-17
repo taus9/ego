@@ -90,7 +90,7 @@ func printParserErrors(out io.Writer, parseError *parser.ParseError) {
 		var msg string
 		switch i {
 		case size - 1:
-			msg = "\n\tStack trace:    -->"
+			msg = "\n\tParser Trace:   -->"
 		default:
 			msg = "\t\t   "
 		}
@@ -125,6 +125,10 @@ func stackTraceItemToString(item int) string {
 		return "FUNCTION CALL ARGUMENTS"
 	case parser.FUNC:
 		return "FUNCTION"
+	case parser.FOR:
+		return "FOR LOOP"
+	case parser.ASSIGN:
+		return "ASSIGNMENT"
 	default:
 		return "UNKNOWN"
 	}
