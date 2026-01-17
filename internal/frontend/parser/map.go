@@ -11,20 +11,31 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 	mapLiteral := &ast.MapLiteral{Token: p.curToken}
 	mapLiteral.Pairs = make(map[ast.Expression]ast.Expression)
 
-	for !p.peekTokenIs(token.RBRACE) {
+	p.nextToken()
+
+	for !p.curTokenIs(token.RBRACE) {
 		p.nextToken()
+		for p.curTokenIs(token.EOL) {
+			p.nextToken()
+		}
 		key := p.parseExpression(LOWEST)
 
 		if p.errorExist() {
 			return nil
 		}
 
-		if !p.expectPeek(token.COLON) {
-			p.createErrorMessage(fmt.Sprintf("expected ':' after map key, got %s instead", p.peekToken.Type))
+		p.nextToken()
+
+		if !p.curTokenIs(token.COLON) {
+			p.createErrorMessage("expected ':' after map key")
 			return nil
 		}
 
-		p.nextToken()
+		p.nextToken() // consuming ':'
+
+		for p.curTokenIs(token.EOL) {
+			p.nextToken()
+		}
 		value := p.parseExpression(LOWEST)
 
 		if p.errorExist() {
@@ -32,16 +43,15 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 		}
 
 		mapLiteral.Pairs[key] = value
+		p.nextToken()
+		for p.curTokenIs(token.EOL) {
+			p.nextToken()
+		}
 
-		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
-			p.createErrorMessage(fmt.Sprintf("expected ',' or '}' after map pair, got %s instead", p.peekToken.Type))
+		if !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.COMMA) {
+			p.createErrorMessage(fmt.Sprintf("expected ',' or '}' after map pair, got %s instead", p.curToken.Type))
 			return nil
 		}
-	}
-
-	if !p.expectPeek(token.RBRACE) {
-		p.createErrorMessage(fmt.Sprintf("expected '}' at end of map literal, got %s instead", p.peekToken.Type))
-		return nil
 	}
 
 	p.stackTrace.Pop()
