@@ -1,0 +1,40 @@
+# ego version 0.1.0
+# geeksforgeeks.org/dsa/quick-sort-algorithm/
+
+:partition array, low, high
+    
+    pivot := array[high]
+
+    i := low - 1
+
+    for j := low to high - 1
+        if array[j] < pivot
+            i = i + 1
+            swap(array, i, j)
+        ;
+    ;
+
+    swap(array, i + 1, high)
+    ret i + 1
+;
+
+:swap array, i, j
+    temp_i := array[i]
+    array[i] = array[j]
+    array[j] = temp_i
+;
+
+:quicksort array, low, high
+    if low < high
+        pi := partition(array, low, high)
+        quicksort(array, low, pi - 1)
+        quicksort(array, pi + 1, high)
+    ;
+;
+
+arr := [10, 7, 8, 9, 1, 5]
+n := len(arr)
+
+quicksort(arr, 0, n - 1)
+
+put('Sorted array: ' + join(arr, ', '))
