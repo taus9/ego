@@ -1,11 +1,13 @@
+# ego version 0.1.0
+# this example demonstrates a simple binary tree structure
+# and a function to calculate the sum of all node values in the tree
+
 :find_sum root
     if root == nil
         ret 0
     ;
-
     ret root['value'] + find_sum(root['left']) + find_sum(root['right'])
 ;
-
 
 node_five := {'value': 5, 'left': nil, 'right': nil}
 node_six  := {'value': 6, 'left': nil, 'right': nil}
