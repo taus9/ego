@@ -2,18 +2,14 @@
 # geeksforgeeks.org/dsa/quick-sort-algorithm/
 
 :partition array, low, high
-    
     pivot := array[high]
-
     i := low - 1
-
     for j := low to high - 1
         if array[j] < pivot
             i = i + 1
             swap(array, i, j)
         ;
     ;
-
     swap(array, i + 1, high)
     ret i + 1
 ;
