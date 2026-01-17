@@ -1,0 +1,36 @@
+# ego version 0.1.0
+
+# functions are declared using the : symbol
+# followed by the function name and parameters
+# parameters are separated by commas
+# and parameters should NOT be enclosed in parentheses
+# the function body is enclosed with the ; symbol
+
+# you can use the ret keyword to return a value from the function
+# or the last evaluated expression will be returned by default
+# if no return value is specified the function returns nil
+
+:add x, y
+    ret x + y
+;
+
+result := add(10, 20)
+put('The result of addition is ' + str(result))
+
+:greet name
+    'Hello, ' + name + '!'
+;
+
+greeting := greet('Ego')
+put(greeting)
+
+# recursive function example
+:factorial n
+    if n == 0
+        ret 1
+    ;
+    ret n * factorial(n - 1)
+;
+
+fact_five := factorial(5)
+put('Factorial of 5 is ' + str(fact_five))
