@@ -80,6 +80,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isError(val) {
 			return val
 		}
+		if node.Name.Value == "_" {
+			// discard value assigned to underscore
+			return NIL
+		}
 		env.Set(node.Name.Value, val)
 
 	case *ast.AssignStatement:
@@ -99,6 +103,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			val := Eval(node.Value, env)
 			if isError(val) {
 				return val
+			}
+			if assignName == "_" {
+				// discard value assigned to underscore
+				return NIL
 			}
 			env.Set(assignName, val)
 
@@ -235,8 +243,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		switch iterable := iterableObj.(type) {
 		case *object.Array:
 			for idx, element := range iterable.Elements {
-				env.Set(node.Index.Value, &object.Integer{Value: int64(idx)})
-				env.Set(node.Value.Value, element)
+				if node.Index.Value != "_" {
+					env.Set(node.Index.Value, &object.Integer{Value: int64(idx)})
+				}
+				if node.Value.Value != "_" {
+					env.Set(node.Value.Value, element)
+				}
 				evalResult := Eval(node.Body, env)
 				if isError(evalResult) {
 					return evalResult
@@ -250,8 +262,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			}
 		case *object.Map:
 			for _, pair := range iterable.Pairs {
-				env.Set(node.Index.Value, pair.Key)
-				env.Set(node.Value.Value, pair.Value)
+				if node.Index.Value != "_" {
+					env.Set(node.Index.Value, pair.Key)
+				}
+				if node.Value.Value != "_" {
+					env.Set(node.Value.Value, pair.Value)
+				}
 				evalResult := Eval(node.Body, env)
 				if isError(evalResult) {
 					return evalResult
