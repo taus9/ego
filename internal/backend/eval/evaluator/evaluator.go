@@ -30,9 +30,13 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		currentToken = node.Token
 		return evalBlockStatement(node, env)
 
-	case *ast.IfExpression:
+	case *ast.IfBlockExpression:
 		currentToken = node.Token
-		return evalIfExpression(node, env)
+		return evalIfBlockExpression(node, env)
+
+	case *ast.IfTernaryExpression:
+		currentToken = node.Token
+		return evalIfTernaryExpression(node, env)
 
 	case *ast.ReturnStatement:
 		currentToken = node.Token
@@ -539,7 +543,23 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 	}
 }
 
-func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Object {
+func evalIfBlockExpression(ie *ast.IfBlockExpression, env *object.Environment) object.Object {
+	condition := Eval(ie.Condition, env)
+
+	if isError(condition) {
+		return condition
+	}
+
+	if isTruthy(condition) {
+		return Eval(ie.Consequence, env)
+	} else if ie.Alternative != nil {
+		return Eval(ie.Alternative, env)
+	} else {
+		return NIL
+	}
+}
+
+func evalIfTernaryExpression(ie *ast.IfTernaryExpression, env *object.Environment) object.Object {
 	condition := Eval(ie.Condition, env)
 
 	if isError(condition) {

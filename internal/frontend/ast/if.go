@@ -5,31 +5,57 @@ import (
 	"ego/internal/frontend/token"
 )
 
-type IfExpression struct {
+type IfBlockExpression struct {
 	Token       token.Token // The 'if' token
 	Condition   Expression  // The condition expression
 	Consequence *BlockStatement
 	Alternative *BlockStatement
 }
 
-func (ie *IfExpression) expressionNode() {}
+func (ibe *IfBlockExpression) expressionNode() {}
 
-func (ie *IfExpression) TokenLiteral() string {
-	return ie.Token.Literal
+func (ibe *IfBlockExpression) TokenLiteral() string {
+	return ibe.Token.Literal
 }
 
-func (ie *IfExpression) String() string {
+func (ibe *IfBlockExpression) String() string {
 	var out bytes.Buffer
 
 	out.WriteString("if")
-	out.WriteString(ie.Condition.String())
+	out.WriteString(ibe.Condition.String())
 	out.WriteString(" ")
-	out.WriteString(ie.Consequence.String())
+	out.WriteString(ibe.Consequence.String())
 
-	if ie.Alternative != nil {
+	if ibe.Alternative != nil {
 		out.WriteString("else ")
-		out.WriteString(ie.Alternative.String())
+		out.WriteString(ibe.Alternative.String())
 	}
+
+	return out.String()
+}
+
+type IfTernaryExpression struct {
+	Token       token.Token // The 'if' token
+	Condition   Expression  // The condition expression
+	Consequence Expression
+	Alternative Expression
+}
+
+func (ite *IfTernaryExpression) expressionNode() {}
+
+func (ite *IfTernaryExpression) TokenLiteral() string {
+	return ite.Token.Literal
+}
+
+func (ite *IfTernaryExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("if")
+	out.WriteString(ite.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(ite.Consequence.String())
+	out.WriteString(" else ")
+	out.WriteString(ite.Alternative.String())
 
 	return out.String()
 }
