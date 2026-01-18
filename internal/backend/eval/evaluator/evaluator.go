@@ -92,6 +92,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				return newError("identifier not declared: %s", assignName)
 			}
 
+			if !node.Name.Mutable {
+				return newError("cannot assign to constant: %s", assignName)
+			}
+
 			val := Eval(node.Value, env)
 			if isError(val) {
 				return val

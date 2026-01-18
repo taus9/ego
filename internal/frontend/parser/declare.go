@@ -10,6 +10,12 @@ func (p *Parser) parseDeclareStatement() *ast.DeclareStatement {
 	stmt := &ast.DeclareStatement{Token: token.Token{Type: token.DECLARE, Literal: token.DECLARE_INTERNAL}}
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
+	if p.curTokenIs(token.CONST) {
+		stmt.Name.Mutable = false
+	} else {
+		stmt.Name.Mutable = true
+	}
+
 	p.nextToken() // consume indentifier
 	p.nextToken() // consume ':='
 

@@ -195,7 +195,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
-	case token.IDENT:
+	case token.IDENT, token.CONST:
 		if p.peekTokenIs(token.DECLARE) {
 			return p.parseDeclareStatement()
 		}
