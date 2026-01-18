@@ -23,6 +23,8 @@ const (
 	BUILTIN_OBJ      = "BUILTIN"
 	ARRAY_OBJ        = "ARRAY"
 	MAP_OBJ          = "MAP"
+	BREAK_OBJ        = "BREAK"
+	AGAIN_OBJ        = "AGAIN"
 )
 
 type Object interface {
@@ -232,3 +234,13 @@ func (m *Map) Inspect() string {
 type Hashable interface {
 	HasKey() HashKey
 }
+
+type Break struct{}
+
+func (b *Break) Type() ObjectType { return BREAK_OBJ }
+func (b *Break) Inspect() string  { return "break" }
+
+type Again struct{}
+
+func (a *Again) Type() ObjectType { return AGAIN_OBJ }
+func (a *Again) Inspect() string  { return "again" }

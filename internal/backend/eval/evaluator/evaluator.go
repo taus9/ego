@@ -151,6 +151,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			if isError(evalResult) {
 				return evalResult
 			}
+			if _, ok := evalResult.(*object.Break); ok {
+				break
+			}
+			if _, ok := evalResult.(*object.Again); ok {
+				continue
+			}
 			conditionObj = Eval(node.Condition, env)
 			if isError(conditionObj) {
 				return conditionObj
@@ -181,6 +187,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				if isError(evalResult) {
 					return evalResult
 				}
+				if _, ok := evalResult.(*object.Break); ok {
+					break
+				}
+				if _, ok := evalResult.(*object.Again); ok {
+					continue
+				}
 			}
 		} else {
 			for i := startInt.Value; i >= endInt.Value; i-- {
@@ -188,6 +200,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				evalResult := Eval(node.Body, env)
 				if isError(evalResult) {
 					return evalResult
+				}
+				if _, ok := evalResult.(*object.Break); ok {
+					break
+				}
+				if _, ok := evalResult.(*object.Again); ok {
+					continue
 				}
 			}
 		}
@@ -208,6 +226,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				if isError(evalResult) {
 					return evalResult
 				}
+				if _, ok := evalResult.(*object.Break); ok {
+					break
+				}
+				if _, ok := evalResult.(*object.Again); ok {
+					continue
+				}
 			}
 		case *object.Map:
 			for _, pair := range iterable.Pairs {
@@ -217,10 +241,24 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				if isError(evalResult) {
 					return evalResult
 				}
+				if _, ok := evalResult.(*object.Break); ok {
+					break
+				}
+				if _, ok := evalResult.(*object.Again); ok {
+					continue
+				}
 			}
 		default:
 			return newError("cannot iterate over type: %s", iterableObj.Type())
 		}
+
+	case *ast.BreakStatement:
+		currentToken = node.Token
+		return &object.Break{}
+
+	case *ast.AgainStatement:
+		currentToken = node.Token
+		return &object.Again{}
 
 	case *ast.FunctionStatement:
 		currentToken = node.Token
@@ -507,7 +545,10 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 
 		if result != nil {
 			rt := result.Type()
-			if rt == object.RETURN_VALUE_OBJ || rt == object.ERROR_OBJ {
+			if rt == object.RETURN_VALUE_OBJ ||
+				rt == object.ERROR_OBJ ||
+				rt == object.BREAK_OBJ ||
+				rt == object.AGAIN_OBJ {
 				return result
 			}
 		}
