@@ -118,27 +118,38 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			if isError(leftObj) {
 				return leftObj
 			}
-			arrayObj, ok := leftObj.(*object.Array)
-			if !ok {
-				return newError("assignment target is not an array")
-			}
-			indexInt, ok := indexObj.(*object.Integer)
-			if !ok {
-				return newError("array index must be an integer")
-			}
-			if indexInt.Value < 0 || indexInt.Value >= int64(len(arrayObj.Elements)) {
-				return newError("array index out of bounds")
-			}
-			valueObj := Eval(node.Value, env)
-			if isError(valueObj) {
-				return valueObj
-			}
-			arrayObj.Elements[indexInt.Value] = valueObj
-			env.Set(assignName, arrayObj)
-		} else {
-			return newError("invalid assignment target")
-		}
 
+			switch iteratorObj := leftObj.(type) {
+			case *object.Map:
+				// map index assignment
+				key := indexObj
+				valueObj := Eval(node.Value, env)
+				if isError(valueObj) {
+					return valueObj
+				}
+				iteratorObj.Pairs[key.(object.Hashable).HasKey()] = object.MapPair{Key: key, Value: valueObj}
+				env.Set(assignName, iteratorObj)
+
+			case *object.Array:
+				// array index assignment
+				indexInt, ok := indexObj.(*object.Integer)
+				if !ok {
+					return newError("array index must be an integer")
+				}
+				if indexInt.Value < 0 || indexInt.Value >= int64(len(iteratorObj.Elements)) {
+					return newError("array index out of bounds: %d", indexInt.Value)
+				}
+				valueObj := Eval(node.Value, env)
+				if isError(valueObj) {
+					return valueObj
+				}
+				iteratorObj.Elements[indexInt.Value] = valueObj
+				env.Set(assignName, iteratorObj)
+
+			default:
+				return newError("index assignment not supported for type: %s", leftObj.Type())
+			}
+		}
 	case *ast.ForWhileStatement:
 		currentToken = node.Token
 		conditionObj := Eval(node.Condition, env)
