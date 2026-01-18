@@ -245,6 +245,25 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		switch iterable := iterableObj.(type) {
+		case *object.String:
+			for idx, ch := range iterable.Value {
+				if node.Index.Value != "_" {
+					env.Set(node.Index.Value, &object.Integer{Value: int64(idx)})
+				}
+				if node.Value.Value != "_" {
+					env.Set(node.Value.Value, &object.String{Value: string(ch)})
+				}
+				evalResult := Eval(node.Body, env)
+				if isError(evalResult) {
+					return evalResult
+				}
+				if _, ok := evalResult.(*object.Break); ok {
+					break
+				}
+				if _, ok := evalResult.(*object.Again); ok {
+					continue
+				}
+			}
 		case *object.Array:
 			for idx, element := range iterable.Elements {
 				if node.Index.Value != "_" {
