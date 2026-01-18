@@ -43,6 +43,8 @@ func TestNextToken(t *testing.T) {
 	break
 	again
 	;
+	$PI := 3.14159
+	$ myVar
 	`
 
 	tests := []struct {
@@ -203,6 +205,13 @@ func TestNextToken(t *testing.T) {
 		{token.AGAIN, "again"},
 		{token.EOL, "\n"},
 		{token.END_BLOCK, ";"},
+		{token.EOL, "\n"},
+		{token.CONST, "$PI"},
+		{token.DECLARE, ":="},
+		{token.FLOAT, "3.14159"},
+		{token.EOL, "\n"},
+		{token.UNNAMED_CONST, "$"},
+		{token.IDENT, "myVar"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}

@@ -18,12 +18,14 @@ type Token struct {
 const (
 	ILLEGAL             = "ILLEGAL"
 	UNTERMINATED_STRING = "UNTERMINATED_STRING"
+	UNNAMED_CONST       = "UNNAMED_CONST"
 
 	EOL = "EOL" // - p
 	EOF = "EOF" // - p
 
 	// Identifiers + literals
 	IDENT  = "IDENT"  // add, foobar, x, y, ... - p
+	CONST  = "CONST"  // $PI, $FOO, $BAR
 	INT    = "INT"    // 1343 - p
 	FLOAT  = "FLOAT"  // 3.14 - p
 	STRING = "STRING" // "foobar" - p

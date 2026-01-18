@@ -42,6 +42,17 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 
+	case '$':
+		l.readChar()
+		ident := l.readIdentifier()
+		if ident != "" {
+			tok.Type = token.CONST
+			tok.Literal = "$" + ident
+			tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal)}
+			return tok
+		} else {
+			tok = l.newToken(token.UNNAMED_CONST, '$')
+		}
 	case '=':
 		if l.peekChar() == '=' {
 			ch := l.ch
