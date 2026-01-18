@@ -87,6 +87,7 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
+	p.registerPrefix(token.CONST, p.parseConstant)
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 	p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
@@ -234,6 +235,10 @@ func (p *Parser) parseStatement() ast.Statement {
 
 	case token.UNTERMINATED_STRING:
 		p.createErrorMessage("unterminated string")
+		return nil
+
+	case token.UNNAMED_CONST:
+		p.createErrorMessage("constant '$' must be followed by an identifier")
 		return nil
 
 	case token.ILLEGAL:
