@@ -5,5 +5,5 @@ import (
 )
 
 func (p *Parser) parseConstant() ast.Expression {
-	return &ast.Constant{Token: p.curToken, Value: p.curToken.Literal}
+	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal, Mutable: false}
 }

@@ -25,9 +25,9 @@ func TestParseConstant(t *testing.T) {
 			program.Statements[0])
 	}
 
-	constant, ok := stmt.Expression.(*ast.Constant)
+	constant, ok := stmt.Expression.(*ast.Identifier)
 	if !ok {
-		t.Fatalf("exp not *ast.Constant. got=%T", stmt.Expression)
+		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Expression)
 	}
 	if constant.Value != "$PI" {
 		t.Errorf("constant.Value not %s. got=%s", "$PI", constant.Value)
@@ -35,5 +35,8 @@ func TestParseConstant(t *testing.T) {
 	if constant.TokenLiteral() != "$PI" {
 		t.Errorf("constant.TokenLiteral not %s. got=%s", "$PI",
 			constant.TokenLiteral())
+	}
+	if constant.Mutable {
+		t.Errorf("constant.Mutable should be false. got=%t", constant.Mutable)
 	}
 }

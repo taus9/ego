@@ -36,6 +36,9 @@ func TestIdentifierExpression(t *testing.T) {
 		t.Errorf("ident.TokenLiteral not %s. got=%s", "foobar",
 			ident.TokenLiteral())
 	}
+	if !ident.Mutable {
+		t.Errorf("ident.Mutable should be true. got=%t", ident.Mutable)
+	}
 }
 
 func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {

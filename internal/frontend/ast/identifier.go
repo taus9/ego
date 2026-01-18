@@ -3,8 +3,9 @@ package ast
 import "ego/internal/frontend/token"
 
 type Identifier struct {
-	Token token.Token
-	Value string
+	Token   token.Token
+	Value   string
+	Mutable bool
 }
 
 func (i *Identifier) expressionNode() {}
