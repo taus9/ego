@@ -33,6 +33,24 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
+	"clear": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *object.Array:
+				arg.Elements = arg.Elements[:0]
+			case *object.Map:
+				clear(arg.Pairs)
+			default:
+				return newError("invalid argument type, got=%s", args[0].Type())
+			}
+			return NIL
+		},
+	},
+
 	"type": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
