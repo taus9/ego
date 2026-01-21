@@ -385,6 +385,34 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return evalIndexExpression(left, index)
 
+	case *ast.ElseInlineExpression:
+		currentToken = node.Token
+		tryObj := Eval(node.TryExpression, env)
+
+		if isError(tryObj) {
+			blockEnv := object.NewEnclosedEnvironment(env)
+			blockEnv.Set("$E", tryObj)
+			result := Eval(node.ElseExpression, blockEnv)
+			syncEnvChanges(env, blockEnv)
+			return result
+		}
+
+		return tryObj
+
+	case *ast.ElseBlockExpression:
+		currentToken = node.Token
+		tryObj := Eval(node.TryExpression, env)
+
+		if isError(tryObj) {
+			blockEnv := object.NewEnclosedEnvironment(env)
+			blockEnv.Set("$E", tryObj)
+			result := Eval(node.ElseBlock, blockEnv)
+			syncEnvChanges(env, blockEnv)
+			return result
+		}
+
+		return tryObj
+
 	case *ast.MapLiteral:
 		currentToken = node.Token
 		return evalMapLiteral(node, env)
