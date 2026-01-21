@@ -130,8 +130,8 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.registerPrefix(token.ILLEGAL, p.parseIllegalTokenError)
 
-	p.registerPrefix(token.END_BLOCK, p.parseEndBlockStatement)
-	p.registerPrefix(token.ELSE, p.parseElseExpression)
+	p.registerPrefix(token.END_BLOCK, p.unexpectedEndBlockStatement)
+	p.registerPrefix(token.ELSE, p.unexpectedElseExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
