@@ -7,6 +7,28 @@ import (
 )
 
 var builtins = map[string]*object.Builtin{
+	"abs": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+			switch arg := args[0].(type) {
+			case *object.Integer:
+				if arg.Value < 0 {
+					return &object.Integer{Value: -arg.Value}
+				}
+				return arg
+			case *object.Float:
+				if arg.Value < 0 {
+					return &object.Float{Value: -arg.Value}
+				}
+				return arg
+			default:
+				return newError("argument to 'abs' not supported, got %s", args[0].Type())
+			}
+		},
+	},
+
 	"type": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
