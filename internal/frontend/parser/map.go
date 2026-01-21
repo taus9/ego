@@ -3,7 +3,6 @@ package parser
 import (
 	"ego/internal/frontend/ast"
 	"ego/internal/frontend/token"
-	"fmt"
 )
 
 func (p *Parser) parseMapLiteral() ast.Expression {
@@ -11,13 +10,16 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 	mapLiteral := &ast.MapLiteral{Token: p.curToken}
 	mapLiteral.Pairs = make(map[ast.Expression]ast.Expression)
 
-	p.nextToken()
+	p.nextToken() // consuming '{'
+
+	hasEOLs := false
 
 	for !p.curTokenIs(token.RBRACE) {
-		p.nextToken()
+
 		for p.curTokenIs(token.EOL) {
 			p.nextToken()
 		}
+
 		key := p.parseExpression(LOWEST)
 
 		if p.errorExist() {
@@ -33,9 +35,6 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 
 		p.nextToken() // consuming ':'
 
-		for p.curTokenIs(token.EOL) {
-			p.nextToken()
-		}
 		value := p.parseExpression(LOWEST)
 
 		if p.errorExist() {
@@ -44,14 +43,50 @@ func (p *Parser) parseMapLiteral() ast.Expression {
 
 		mapLiteral.Pairs[key] = value
 		p.nextToken()
+
+		// at this point multiple scenarios are possible
+		// 1. we have a comma with more pairs to come
+		// 2. we have a trailing comma followed by a closing brace
+		// 3. we have a comma, then EOLs, then more pairs
+		// 4. we have a trailing comma, then EOLs, then closing brace
+		// 5. we have EOLs, then closing brace
+		// 6. we have a closing brace right away
+
+		// I don't want to allow EOLs then a comma
+		// there might even be more but this is all I could think of
+
 		for p.curTokenIs(token.EOL) {
 			p.nextToken()
+			hasEOLs = true
 		}
 
-		if !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.COMMA) {
-			p.createErrorMessage(fmt.Sprintf("expected ',' or '}' after map pair, got %s instead", p.curToken.Type))
-			return nil
+		if p.curTokenIs(token.COMMA) {
+			if hasEOLs {
+				p.createErrorMessage("seperator must be the same line as map pair")
+				return nil
+			}
+
+			p.nextToken() // consume comma
+
+			for p.curTokenIs(token.EOL) {
+				p.nextToken()
+			}
+
+			if p.curTokenIs(token.RBRACE) {
+				break
+			}
+
+			//p.nextToken() // consume comma
+			hasEOLs = false
+			continue
 		}
+
+		if p.curTokenIs(token.RBRACE) {
+			break
+		}
+
+		p.createErrorMessage("expected ',' or '}' after map pair")
+		return nil
 	}
 
 	p.stackTrace.Pop()
