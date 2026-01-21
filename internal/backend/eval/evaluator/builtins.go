@@ -34,6 +34,10 @@ var builtins = map[string]*object.Builtin{
 	},
 
 	"clear": {
+
+		// clears all elements from an array or map
+		// runtime error for any other type
+
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1", len(args))
