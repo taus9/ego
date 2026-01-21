@@ -18,6 +18,7 @@ const (
 	BOOLEAN_OBJ         = "boolean"
 	NIL_OBJ             = "nil"
 	UNHANDLED_ERROR_OBJ = "unhandled_error"
+	ERROR_OBJ           = "error"
 	FUNCTION_OBJ        = "function"
 	STRING_OBJ          = "string"
 	BUILTIN_OBJ         = "builtin"
@@ -80,6 +81,26 @@ type UnhandledError struct {
 
 func (ue *UnhandledError) Inspect() string  { return ue.Message }
 func (ue *UnhandledError) Type() ObjectType { return UNHANDLED_ERROR_OBJ }
+
+type Error struct {
+	Pairs map[HashKey]MapPair
+}
+
+func (e *Error) Type() ObjectType { return ERROR_OBJ }
+func (e *Error) Inspect() string {
+	var out bytes.Buffer
+
+	pairs := []string{}
+	for _, pair := range e.Pairs {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", pair.Key.Inspect(), pair.Value.Inspect()))
+	}
+
+	out.WriteString("{")
+	out.WriteString(strings.Join(pairs, ", "))
+	out.WriteString("}")
+
+	return out.String()
+}
 
 type Environment struct {
 	store map[string]Object
@@ -223,12 +244,12 @@ type Map struct {
 	Pairs map[HashKey]MapPair
 }
 
-func (m *Map) Type() ObjectType { return MAP_OBJ }
-func (m *Map) Inspect() string {
+func (m *Map) Type() ObjectType { return ERROR_OBJ }
+func (e *Map) Inspect() string {
 	var out bytes.Buffer
 
 	pairs := []string{}
-	for _, pair := range m.Pairs {
+	for _, pair := range e.Pairs {
 		pairs = append(pairs, fmt.Sprintf("%s: %s", pair.Key.Inspect(), pair.Value.Inspect()))
 	}
 

@@ -6,6 +6,7 @@ import (
 	"ego/internal/frontend/token"
 	"fmt"
 	"slices"
+	"strconv"
 	"sync"
 )
 
@@ -391,8 +392,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		tryObj := Eval(node.TryExpression, env)
 
 		if isError(tryObj) {
+			unhandledError, _ := tryObj.(*object.UnhandledError)
+			errorObj := createErrorObject(unhandledError)
+
 			blockEnv := object.NewEnclosedEnvironment(env)
-			blockEnv.Set("$E", tryObj)
+			blockEnv.Set("$E", errorObj)
+
 			result := Eval(node.ElseExpression, blockEnv)
 			syncEnvChanges(env, blockEnv)
 			return result
@@ -405,8 +410,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		tryObj := Eval(node.TryExpression, env)
 
 		if isError(tryObj) {
+			unhandledError, _ := tryObj.(*object.UnhandledError)
+			errorObj := createErrorObject(unhandledError)
+
 			blockEnv := object.NewEnclosedEnvironment(env)
-			blockEnv.Set("$E", tryObj)
+			blockEnv.Set("$E", errorObj)
+
 			result := Eval(node.ElseBlock, blockEnv)
 			syncEnvChanges(env, blockEnv)
 			return result
@@ -791,9 +800,28 @@ func evalIndexExpression(left, index object.Object) object.Object {
 		return evalArrayIndexExpression(left, index)
 	case left.Type() == object.MAP_OBJ:
 		return evalMapIndexExpression(left, index)
+	case left.Type() == object.ERROR_OBJ:
+		return evalErrorIndexExpression(left, index)
 	default:
 		return newError("index operator not supported: %s", left.Type())
 	}
+}
+
+func evalErrorIndexExpression(errObj, index object.Object) object.Object {
+	errorObject := errObj.(*object.Error)
+
+	key, ok := index.(*object.String)
+	if !ok {
+		return newError("$E index must be a string")
+	}
+
+	hashed := key.HasKey()
+	pair, ok := errorObject.Pairs[hashed]
+	if !ok {
+		return NIL
+	}
+
+	return pair.Value
 }
 
 func evalStringIndexExpression(str, index object.Object) object.Object {
@@ -861,4 +889,28 @@ func evalMapIndexExpression(mapObj, index object.Object) object.Object {
 	}
 
 	return pair.Value
+}
+
+func createErrorObject(unhandledError *object.UnhandledError) *object.Error {
+	pairs := make(map[object.HashKey]object.MapPair)
+
+	messageKey := &object.String{Value: "message"}
+	messageValue := &object.String{Value: unhandledError.Message}
+
+	hashed := messageKey.HasKey()
+	pairs[hashed] = object.MapPair{Key: messageKey, Value: messageValue}
+
+	lineKey := &object.String{Value: "line"}
+	lineValue := &object.String{Value: strconv.Itoa(currentToken.Span.Line)}
+
+	hashed = lineKey.HasKey()
+	pairs[hashed] = object.MapPair{Key: lineKey, Value: lineValue}
+
+	columnKey := &object.String{Value: "column"}
+	columnValue := &object.String{Value: strconv.Itoa(currentToken.Span.Column)}
+
+	hashed = columnKey.HasKey()
+	pairs[hashed] = object.MapPair{Key: columnKey, Value: columnValue}
+
+	return &object.Error{Pairs: pairs}
 }
