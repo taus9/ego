@@ -81,6 +81,32 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
+	"delete": {
+
+		// deletes a key from a map
+		// runtime error if first arg is not a map or if key is not hashable
+
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got=%d, want=2", len(args))
+			}
+
+			if args[0].Type() != object.MAP_OBJ {
+				return newError("first argument to 'delete' must be MAP, got %s", args[0].Type())
+			}
+
+			mapObj := args[0].(*object.Map)
+
+			hashableKey, ok := args[1].(object.Hashable)
+			if !ok {
+				return newError("unusable as map key: %s", args[1].Type())
+			}
+
+			delete(mapObj.Pairs, hashableKey.HasKey())
+			return NIL
+		},
+	},
+
 	"type": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
