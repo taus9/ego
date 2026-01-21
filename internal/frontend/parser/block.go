@@ -60,7 +60,7 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	return block
 }
 
-func (p *Parser) parseEndBlockStatement() ast.Expression {
+func (p *Parser) unexpectedEndBlockStatement() ast.Expression {
 	// this function currently just prevents nonsense parsing errors
 	// END_BLOCK token already consumed in parseBlockStatement
 	// so if another END_BLOCK is encountered here, it's unexpected
@@ -68,7 +68,7 @@ func (p *Parser) parseEndBlockStatement() ast.Expression {
 	return nil
 }
 
-func (p *Parser) parseElseExpression() ast.Expression {
+func (p *Parser) unexpectedElseExpression() ast.Expression {
 	// this function currently just prevents nonsense parsing errors
 	// ELSE token already consumed in parseBlockStatement
 	// so if another ELSE is encountered here, it's unexpected
