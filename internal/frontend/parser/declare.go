@@ -20,8 +20,19 @@ func (p *Parser) parseDeclareStatement() *ast.DeclareStatement {
 	p.nextToken() // consume ':='
 
 	stmt.Value = p.parseExpression(LOWEST)
+
 	if p.errorExist() {
 		return nil
+	}
+
+	if p.peekTokenIs(token.ELSE) {
+		p.nextToken() // consume current expression
+		elseExpr := p.parseElseExpression(stmt.Value)
+		if p.errorExist() {
+			return nil
+		}
+
+		stmt.Value = elseExpr
 	}
 
 	if p.peekTokenIs(token.EOL) {

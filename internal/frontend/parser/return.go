@@ -22,6 +22,16 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 		return nil
 	}
 
+	if p.peekTokenIs(token.ELSE) {
+		p.nextToken() // consume current expression
+		elseExpr := p.parseElseExpression(stmt.ReturnValue)
+		if p.errorExist() {
+			return nil
+		}
+
+		stmt.ReturnValue = elseExpr
+	}
+
 	if p.peekTokenIs(token.EOL) {
 		p.nextToken()
 	}

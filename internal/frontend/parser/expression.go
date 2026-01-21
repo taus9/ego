@@ -10,6 +10,16 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
 	stmt.Expression = p.parseExpression(LOWEST)
 
+	if p.peekTokenIs(token.ELSE) {
+		p.nextToken() // consume current expression
+		elseExpr := p.parseElseExpression(stmt.Expression)
+		if p.errorExist() {
+			return nil
+		}
+
+		stmt.Expression = elseExpr
+	}
+
 	if p.peekTokenIs(token.EOL) {
 		p.nextToken()
 	}
