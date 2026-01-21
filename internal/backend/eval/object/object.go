@@ -12,19 +12,19 @@ import (
 type ObjectType string
 
 const (
-	RETURN_VALUE_OBJ = "return_value"
-	INTEGER_OBJ      = "integer"
-	FLOAT_OBJ        = "float"
-	BOOLEAN_OBJ      = "boolean"
-	NIL_OBJ          = "nil"
-	ERROR_OBJ        = "error"
-	FUNCTION_OBJ     = "function"
-	STRING_OBJ       = "string"
-	BUILTIN_OBJ      = "builtin"
-	ARRAY_OBJ        = "array"
-	MAP_OBJ          = "map"
-	BREAK_OBJ        = "break"
-	AGAIN_OBJ        = "again"
+	RETURN_VALUE_OBJ    = "return_value"
+	INTEGER_OBJ         = "integer"
+	FLOAT_OBJ           = "float"
+	BOOLEAN_OBJ         = "boolean"
+	NIL_OBJ             = "nil"
+	UNHANDLED_ERROR_OBJ = "unhandled_error"
+	FUNCTION_OBJ        = "function"
+	STRING_OBJ          = "string"
+	BUILTIN_OBJ         = "builtin"
+	ARRAY_OBJ           = "array"
+	MAP_OBJ             = "map"
+	BREAK_OBJ           = "break"
+	AGAIN_OBJ           = "again"
 )
 
 type Object interface {
@@ -74,12 +74,12 @@ type ReturnValue struct {
 func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
 func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
 
-type Error struct {
+type UnhandledError struct {
 	Message string
 }
 
-func (e *Error) Inspect() string  { return e.Message }
-func (e *Error) Type() ObjectType { return ERROR_OBJ }
+func (ue *UnhandledError) Inspect() string  { return ue.Message }
+func (ue *UnhandledError) Type() ObjectType { return UNHANDLED_ERROR_OBJ }
 
 type Environment struct {
 	store map[string]Object

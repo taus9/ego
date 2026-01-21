@@ -488,7 +488,7 @@ func evalProgram(stmts []ast.Statement, env *object.Environment) object.Object {
 		switch result := result.(type) {
 		case *object.ReturnValue:
 			return result.Value
-		case *object.Error:
+		case *object.UnhandledError:
 			return result
 		}
 	}
@@ -700,13 +700,13 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 	return result
 }
 
-func newError(format string, a ...interface{}) *object.Error {
+func newError(format string, a ...interface{}) *object.UnhandledError {
 	ferr := fmt.Sprintf(format, a...)
 	loc := fmt.Sprintf("line %d, column %d", currentToken.Span.Line, currentToken.Span.Column)
 
 	msg := "\tYikes!\n\tRuntime Error:  " + ferr + "\n\tError Location: " + loc
 
-	return &object.Error{Message: msg}
+	return &object.UnhandledError{Message: msg}
 }
 
 func isError(obj object.Object) bool {

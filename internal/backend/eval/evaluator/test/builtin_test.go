@@ -24,7 +24,7 @@ func TestBuiltinFunctions(t *testing.T) {
 		case int:
 			testIntegerObject(t, evaluated, int64(expected))
 		case string:
-			errObj, ok := evaluated.(*object.Error)
+			errObj, ok := evaluated.(*object.UnhandledError)
 			if !ok {
 				t.Errorf("object is not Error. got=%T (%+v)", evaluated, evaluated)
 				continue
@@ -88,7 +88,7 @@ func TestBuiltinFunctionPush(t *testing.T) {
 				testIntegerObject(t, result.Elements[i], expectedElem.(*object.Integer).Value)
 			}
 		case string:
-			errObj, ok := evaluated.(*object.Error)
+			errObj, ok := evaluated.(*object.UnhandledError)
 			if !ok {
 				t.Errorf("object is not Error. got=%T (%+v)", evaluated, evaluated)
 				continue

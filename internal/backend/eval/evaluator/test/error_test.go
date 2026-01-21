@@ -59,7 +59,7 @@ func TestErrorHandling(t *testing.T) {
 
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
-		errObj, ok := evaluated.(*object.Error)
+		errObj, ok := evaluated.(*object.UnhandledError)
 		if !ok {
 			t.Errorf("no error object returned. got=%T (%+v)", evaluated, evaluated)
 			continue
