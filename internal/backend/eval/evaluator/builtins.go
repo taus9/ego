@@ -150,6 +150,49 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
+	"min": {
+
+		// returns the minimum value from a list of numbers
+		// runtime error for unsupported types or no arguments
+
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) == 0 {
+				return newError("min() requires at least one argument")
+			}
+
+			var minValue object.Object = args[0]
+
+			for _, arg := range args[1:] {
+				switch min := minValue.(type) {
+				case *object.Integer:
+					if arg.Type() != object.INTEGER_OBJ && arg.Type() != object.FLOAT_OBJ {
+						return newError("argument to 'min' not supported, got %s", arg.Type())
+					}
+					if argInt, ok := arg.(*object.Integer); ok && argInt.Value < min.Value {
+						minValue = arg
+					}
+					if argFloat, ok := arg.(*object.Float); ok && argFloat.Value < float64(min.Value) {
+						minValue = arg
+					}
+				case *object.Float:
+					if arg.Type() != object.FLOAT_OBJ && arg.Type() != object.INTEGER_OBJ {
+						return newError("argument to 'min' not supported, got %s", arg.Type())
+					}
+					if argFloat, ok := arg.(*object.Float); ok && argFloat.Value < min.Value {
+						minValue = arg
+					}
+					if argInt, ok := arg.(*object.Integer); ok && float64(argInt.Value) < min.Value {
+						minValue = arg
+					}
+				default:
+					return newError("argument to 'min' not supported, got %s", arg.Type())
+				}
+			}
+
+			return minValue
+		},
+	},
+
 	"type": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
