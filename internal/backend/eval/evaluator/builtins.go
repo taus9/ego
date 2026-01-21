@@ -107,6 +107,49 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
+	"max": {
+
+		// returns the maximum value from a list of numbers
+		// runtime error for unsupported types or no arguments
+
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) == 0 {
+				return newError("max() requires at least one argument")
+			}
+
+			var maxValue object.Object = args[0]
+
+			for _, arg := range args[1:] {
+				switch max := maxValue.(type) {
+				case *object.Integer:
+					if arg.Type() != object.INTEGER_OBJ && arg.Type() != object.FLOAT_OBJ {
+						return newError("argument to 'max' not supported, got %s", arg.Type())
+					}
+					if argInt, ok := arg.(*object.Integer); ok && argInt.Value > max.Value {
+						maxValue = arg
+					}
+					if argFloat, ok := arg.(*object.Float); ok && argFloat.Value > float64(max.Value) {
+						maxValue = arg
+					}
+				case *object.Float:
+					if arg.Type() != object.FLOAT_OBJ && arg.Type() != object.INTEGER_OBJ {
+						return newError("argument to 'max' not supported, got %s", arg.Type())
+					}
+					if argFloat, ok := arg.(*object.Float); ok && argFloat.Value > max.Value {
+						maxValue = arg
+					}
+					if argInt, ok := arg.(*object.Integer); ok && float64(argInt.Value) > max.Value {
+						maxValue = arg
+					}
+				default:
+					return newError("argument to 'max' not supported, got %s", arg.Type())
+				}
+			}
+
+			return maxValue
+		},
+	},
+
 	"type": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
