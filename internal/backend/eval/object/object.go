@@ -119,6 +119,14 @@ func (e *Environment) Exists(name string) bool {
 	return ok
 }
 
+func (e *Environment) Delete(name string) {
+	delete(e.store, name)
+}
+
+func (e *Environment) GetStore() map[string]Object {
+	return e.store
+}
+
 type Function struct {
 	Parameters []*ast.Identifier
 	Body       *ast.BlockStatement

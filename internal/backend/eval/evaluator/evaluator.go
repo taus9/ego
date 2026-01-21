@@ -6,6 +6,7 @@ import (
 	"ego/internal/frontend/token"
 	"fmt"
 	"slices"
+	"sync"
 )
 
 var reservedWords = []string{
@@ -207,13 +208,19 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return newError("FOR loop bounds must be integers")
 		}
 
+		defer env.Delete(node.Iterator.Value)
+
 		if startInt.Value <= endInt.Value {
 			for i := startInt.Value; i <= endInt.Value; i++ {
 				env.Set(node.Iterator.Value, &object.Integer{Value: i})
-				evalResult := Eval(node.Body, env)
+				blockEnv := object.NewEnclosedEnvironment(env)
+				evalResult := Eval(node.Body, blockEnv)
 				if isError(evalResult) {
 					return evalResult
 				}
+
+				syncEnvChanges(env, blockEnv)
+
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -224,10 +231,14 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		} else {
 			for i := startInt.Value; i >= endInt.Value; i-- {
 				env.Set(node.Iterator.Value, &object.Integer{Value: i})
-				evalResult := Eval(node.Body, env)
+				blockEnv := object.NewEnclosedEnvironment(env)
+				evalResult := evalBlockStatement(node.Body, blockEnv)
 				if isError(evalResult) {
 					return evalResult
 				}
+
+				syncEnvChanges(env, blockEnv)
+
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -244,6 +255,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return iterableObj
 		}
 
+		defer env.Delete(node.Index.Value)
+		defer env.Delete(node.Value.Value)
+
 		switch iterable := iterableObj.(type) {
 		case *object.String:
 			for idx, ch := range iterable.Value {
@@ -253,10 +267,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				if node.Value.Value != "_" {
 					env.Set(node.Value.Value, &object.String{Value: string(ch)})
 				}
-				evalResult := Eval(node.Body, env)
+
+				blockEnv := object.NewEnclosedEnvironment(env)
+				evalResult := evalBlockStatement(node.Body, blockEnv)
+
 				if isError(evalResult) {
 					return evalResult
 				}
+
+				syncEnvChanges(env, blockEnv)
+
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -272,10 +292,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				if node.Value.Value != "_" {
 					env.Set(node.Value.Value, element)
 				}
-				evalResult := Eval(node.Body, env)
+
+				blockEnv := object.NewEnclosedEnvironment(env)
+				evalResult := evalBlockStatement(node.Body, blockEnv)
+
 				if isError(evalResult) {
 					return evalResult
 				}
+
+				syncEnvChanges(env, blockEnv)
+
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -291,10 +317,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				if node.Value.Value != "_" {
 					env.Set(node.Value.Value, pair.Value)
 				}
-				evalResult := Eval(node.Body, env)
+
+				blockEnv := object.NewEnclosedEnvironment(env)
+				evalResult := evalBlockStatement(node.Body, blockEnv)
+
 				if isError(evalResult) {
 					return evalResult
 				}
+
+				syncEnvChanges(env, blockEnv)
+
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -397,6 +429,18 @@ func InitReservedValues(env *object.Environment) {
 func isReservedWord(word string) bool {
 	_, ok := builtins[word]
 	return slices.Contains(reservedWords, word) || ok
+}
+
+func syncEnvChanges(parentEnv, childEnv *object.Environment) {
+	var mu sync.Mutex
+	mu.Lock()
+	defer mu.Unlock()
+
+	for key, val := range childEnv.GetStore() {
+		if parentEnv.Exists(key) {
+			parentEnv.Set(key, val)
+		}
+	}
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
