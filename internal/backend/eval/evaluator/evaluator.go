@@ -715,7 +715,7 @@ func newError(format string, a ...interface{}) *object.UnhandledError {
 
 	msg := "\tYikes!\n\tRuntime Error:  " + ferr + "\n\tError Location: " + loc
 
-	return &object.UnhandledError{Message: msg}
+	return &object.UnhandledError{Message: ferr, FormattedMessage: msg}
 }
 
 func isError(obj object.Object) bool {
