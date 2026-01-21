@@ -11,6 +11,7 @@ import (
 
 var reservedWords = []string{
 	"nil",
+	"$E",
 }
 
 var currentToken token.Token
@@ -688,7 +689,7 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 		if result != nil {
 			rt := result.Type()
 			if rt == object.RETURN_VALUE_OBJ ||
-				rt == object.ERROR_OBJ ||
+				rt == object.UNHANDLED_ERROR_OBJ ||
 				rt == object.BREAK_OBJ ||
 				rt == object.AGAIN_OBJ {
 				return result
@@ -710,7 +711,7 @@ func newError(format string, a ...interface{}) *object.Error {
 
 func isError(obj object.Object) bool {
 	if obj != nil {
-		return obj.Type() == object.ERROR_OBJ
+		return obj.Type() == object.UNHANDLED_ERROR_OBJ
 	}
 	return false
 }

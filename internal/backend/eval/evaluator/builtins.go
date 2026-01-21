@@ -22,7 +22,7 @@ var builtins = map[string]*object.Builtin{
 				return newError("wrong number of arguments. got=%d, want=1", len(args))
 			}
 			switch args[0].Type() {
-			case object.ERROR_OBJ:
+			case object.UNHANDLED_ERROR_OBJ:
 				return FALSE
 			default:
 				return TRUE
