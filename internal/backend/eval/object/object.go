@@ -12,19 +12,19 @@ import (
 type ObjectType string
 
 const (
-	RETURN_VALUE_OBJ = "RETURN_VALUE"
-	INTEGER_OBJ      = "INTEGER"
-	FLOAT_OBJ        = "FLOAT"
-	BOOLEAN_OBJ      = "BOOLEAN"
-	NIL_OBJ          = "NIL"
-	ERROR_OBJ        = "ERROR"
-	FUNCTION_OBJ     = "FUNCTION"
-	STRING_OBJ       = "STRING"
-	BUILTIN_OBJ      = "BUILTIN"
-	ARRAY_OBJ        = "ARRAY"
-	MAP_OBJ          = "MAP"
-	BREAK_OBJ        = "BREAK"
-	AGAIN_OBJ        = "AGAIN"
+	RETURN_VALUE_OBJ = "return_value"
+	INTEGER_OBJ      = "integer"
+	FLOAT_OBJ        = "float"
+	BOOLEAN_OBJ      = "boolean"
+	NIL_OBJ          = "nil"
+	ERROR_OBJ        = "error"
+	FUNCTION_OBJ     = "function"
+	STRING_OBJ       = "string"
+	BUILTIN_OBJ      = "builtin"
+	ARRAY_OBJ        = "array"
+	MAP_OBJ          = "map"
+	BREAK_OBJ        = "break"
+	AGAIN_OBJ        = "again"
 )
 
 type Object interface {
