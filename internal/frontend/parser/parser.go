@@ -21,6 +21,7 @@ const (
 	FUNC
 	FOR
 	ASSIGN
+	ELSE
 )
 
 const (
