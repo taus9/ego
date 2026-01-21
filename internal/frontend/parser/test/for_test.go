@@ -51,7 +51,7 @@ func TestParsingForWhileStatement(t *testing.T) {
 }
 
 func TestParsingForToStatement(t *testing.T) {
-	input := "for i = 0 + 2 to a \n ret i \n ;"
+	input := "for i := 0 + 2 to a \n ret i \n ;"
 
 	l := lexer.New(input)
 	p := parser.New(l)

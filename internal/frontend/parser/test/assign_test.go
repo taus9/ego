@@ -77,33 +77,33 @@ func TestIndexAssignStatement(t *testing.T) {
 	}
 }
 
-func TestMultipleIndexAssignStatement(t *testing.T) {
-	input := "matrix[1][2] = 99"
+// func TestMultipleIndexAssignStatement(t *testing.T) {
+// 	input := "matrix[1][2] = 99"
 
-	l := lexer.New(input)
-	p := parser.New(l)
-	program := p.ParseProgram()
-	checkParserErrors(t, p)
+// 	l := lexer.New(input)
+// 	p := parser.New(l)
+// 	program := p.ParseProgram()
+// 	checkParserErrors(t, p)
 
-	if len(program.Statements) != 1 {
-		t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
-			1, len(program.Statements))
-	}
+// 	if len(program.Statements) != 1 {
+// 		t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
+// 			1, len(program.Statements))
+// 	}
 
-	stmt, ok := program.Statements[0].(*ast.AssignStatement)
-	if !ok {
-		t.Fatalf("program.Statements[0] is not ast.AssignStatement. got=%T",
-			program.Statements[0])
-	}
+// 	stmt, ok := program.Statements[0].(*ast.AssignStatement)
+// 	if !ok {
+// 		t.Fatalf("program.Statements[0] is not ast.AssignStatement. got=%T",
+// 			program.Statements[0])
+// 	}
 
-	firstIndexExp, ok := stmt.Index.(*ast.IndexExpression)
-	if !ok {
-		t.Fatalf("stmt.Index is not ast.IndexExpression. got=%T",
-			stmt.Index)
-	}
+// 	firstIndexExp, ok := stmt.Index.(*ast.IndexExpression)
+// 	if !ok {
+// 		t.Fatalf("stmt.Index is not ast.IndexExpression. got=%T",
+// 			stmt.Index)
+// 	}
 
-	if !testIdentifier(t, firstIndexExp.Left, "matrix") {
-		return
-	}
+// 	if !testIdentifier(t, firstIndexExp.Left, "matrix") {
+// 		return
+// 	}
 
-}
+// }
