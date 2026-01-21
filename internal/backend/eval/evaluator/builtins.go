@@ -7,6 +7,29 @@ import (
 )
 
 var builtins = map[string]*object.Builtin{
+	"type": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+			return &object.String{Value: string(args[0].Type())}
+		},
+	},
+
+	"ok": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+			switch args[0].Type() {
+			case object.ERROR_OBJ:
+				return FALSE
+			default:
+				return TRUE
+			}
+		},
+	},
+
 	"put": {
 		Fn: func(args ...object.Object) object.Object {
 			for _, arg := range args {
@@ -105,15 +128,6 @@ var builtins = map[string]*object.Builtin{
 				return newError("wrong number of arguments. got=%d, want=1", len(args))
 			}
 			return &object.String{Value: args[0].Inspect()}
-		},
-	},
-
-	"type": {
-		Fn: func(args ...object.Object) object.Object {
-			if len(args) != 1 {
-				return newError("wrong number of arguments. got=%d, want=1", len(args))
-			}
-			return &object.String{Value: string(args[0].Type())}
 		},
 	},
 
