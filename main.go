@@ -55,7 +55,7 @@ func run(source string) {
 	evaluator.InitReservedValues(env)
 	evalRes := evaluator.Eval(program, env)
 
-	if evalRes != nil && evalRes.Type() == object.ERROR_OBJ {
+	if evalRes != nil && evalRes.Type() == object.UNHANDLED_ERROR_OBJ {
 		fmt.Println(evalRes.Inspect())
 	}
 }
