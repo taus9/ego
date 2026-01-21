@@ -8,6 +8,10 @@ import (
 
 var builtins = map[string]*object.Builtin{
 	"abs": {
+
+		// returns the absolute value of an integer or float
+		// runtime error for any other type
+
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1", len(args))
@@ -39,6 +43,10 @@ var builtins = map[string]*object.Builtin{
 	},
 
 	"ok": {
+
+		// returns a BOOLEAN of TRUE if arg is an ERROR_OBJ
+		// returns FALSE for any other type
+
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
 				return newError("wrong number of arguments. got=%d, want=1", len(args))
