@@ -80,7 +80,7 @@ type UnhandledError struct {
 	FormattedMessage string
 }
 
-func (ue *UnhandledError) Inspect() string  { return ue.Message }
+func (ue *UnhandledError) Inspect() string  { return ue.FormattedMessage }
 func (ue *UnhandledError) Type() ObjectType { return UNHANDLED_ERROR_OBJ }
 
 type Error struct {
