@@ -3,6 +3,7 @@ package evaluator
 import (
 	"ego/internal/backend/eval/object"
 	"fmt"
+	"maps"
 	"strings"
 )
 
@@ -52,6 +53,31 @@ var builtins = map[string]*object.Builtin{
 				return newError("invalid argument type, got=%s", args[0].Type())
 			}
 			return NIL
+		},
+	},
+
+	"copy": {
+
+		// returns a shallow copy of an array or map
+		// runtime error for any other type
+
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+
+			switch arg := args[0].(type) {
+			case *object.Array:
+				newElements := make([]object.Object, len(arg.Elements))
+				copy(newElements, arg.Elements)
+				return &object.Array{Elements: newElements}
+			case *object.Map:
+				newPairs := make(map[object.HashKey]object.MapPair)
+				maps.Copy(newPairs, arg.Pairs)
+				return &object.Map{Pairs: newPairs}
+			default:
+				return newError("invalid argument type, got=%s", args[0].Type())
+			}
 		},
 	},
 
