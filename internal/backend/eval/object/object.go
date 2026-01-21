@@ -245,7 +245,7 @@ type Map struct {
 	Pairs map[HashKey]MapPair
 }
 
-func (m *Map) Type() ObjectType { return ERROR_OBJ }
+func (m *Map) Type() ObjectType { return MAP_OBJ }
 func (e *Map) Inspect() string {
 	var out bytes.Buffer
 
