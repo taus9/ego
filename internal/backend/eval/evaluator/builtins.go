@@ -57,19 +57,34 @@ var builtins = map[string]*object.Builtin{
 		// runtime error for any other type
 
 		Fn: func(args ...object.Object) object.Object {
-			if len(args) != 1 {
-				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got=%d, want=2", len(args))
 			}
 
-			switch arg := args[0].(type) {
+			switch dstObject := args[0].(type) {
 			case *object.Array:
-				newElements := make([]object.Object, len(arg.Elements))
-				copy(newElements, arg.Elements)
-				return &object.Array{Elements: newElements}
+				srcArray, ok := args[1].(*object.Array)
+				if !ok {
+					return newError("second argument must be ARRAY, got %s", args[1].Type())
+				}
+
+				newElements := make([]object.Object, len(srcArray.Elements))
+				copy(newElements, srcArray.Elements)
+				dstObject.Elements = newElements
+
+				return &object.Integer{Value: int64(len(newElements))}
+
 			case *object.Map:
-				newPairs := make(map[object.HashKey]object.MapPair)
-				maps.Copy(newPairs, arg.Pairs)
-				return &object.Map{Pairs: newPairs}
+				srcMap, ok := args[1].(*object.Map)
+				if !ok {
+					return newError("second argument must be MAP, got %s", args[1].Type())
+				}
+
+				clear(dstObject.Pairs)
+				maps.Copy(dstObject.Pairs, srcMap.Pairs)
+
+				return &object.Integer{Value: int64(len(dstObject.Pairs))}
+
 			default:
 				return newError("invalid argument type, got=%s", args[0].Type())
 			}
