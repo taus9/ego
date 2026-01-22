@@ -91,24 +91,6 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
-	"ok": {
-
-		// returns a BOOLEAN of TRUE if arg is an ERROR_OBJ
-		// returns FALSE for any other type
-
-		Fn: func(args ...object.Object) object.Object {
-			if len(args) != 1 {
-				return newError("wrong number of arguments. got=%d, want=1", len(args))
-			}
-			switch args[0].Type() {
-			case object.ERROR_OBJ:
-				return FALSE
-			default:
-				return TRUE
-			}
-		},
-	},
-
 	"put": {
 		Fn: func(args ...object.Object) object.Object {
 			for _, arg := range args {
