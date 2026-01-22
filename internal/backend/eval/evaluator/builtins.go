@@ -118,6 +118,41 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
+	"error": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got=%d, want=1", len(args))
+			}
+
+			if args[0].Type() != object.STRING_OBJ {
+				return newError("argument to must be STRING, got %s", args[0].Type())
+			}
+
+			strObj := args[0].(*object.String)
+			pairs := make(map[object.HashKey]object.MapPair)
+
+			messageKey := &object.String{Value: "message"}
+			messageValue := &object.String{Value: strObj.Value}
+
+			hashed := messageKey.HasKey()
+			pairs[hashed] = object.MapPair{Key: messageKey, Value: messageValue}
+
+			lineKey := &object.String{Value: "line"}
+			lineValue := NIL
+
+			hashed = lineKey.HasKey()
+			pairs[hashed] = object.MapPair{Key: lineKey, Value: lineValue}
+
+			columnKey := &object.String{Value: "column"}
+			columnValue := NIL
+
+			hashed = columnKey.HasKey()
+			pairs[hashed] = object.MapPair{Key: columnKey, Value: columnValue}
+
+			return &object.Error{Pairs: pairs}
+		},
+	},
+
 	"float": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
