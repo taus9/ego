@@ -111,9 +111,10 @@ var builtins = map[string]*object.Builtin{
 			if !ok {
 				return newError("unusable as map key: %s", args[1].Type())
 			}
-
+			_, ok = mapObj.Pairs[hashableKey.HasKey()]
 			delete(mapObj.Pairs, hashableKey.HasKey())
-			return NIL
+
+			return &object.Boolean{Value: ok}
 		},
 	},
 
