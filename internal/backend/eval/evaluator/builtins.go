@@ -4,7 +4,6 @@ import (
 	"ego/internal/backend/eval/object"
 	"fmt"
 	"maps"
-	"strings"
 )
 
 var builtins = map[string]*object.Builtin{
@@ -191,40 +190,6 @@ var builtins = map[string]*object.Builtin{
 				return newError("wrong number of arguments. got=%d, want=1", len(args))
 			}
 			return &object.String{Value: args[0].Inspect()}
-		},
-	},
-
-	"join": {
-		Fn: func(args ...object.Object) object.Object {
-			if len(args) != 2 {
-				return newError("wrong number of arguments. got=%d, want=2", len(args))
-			}
-
-			if args[0].Type() != object.ARRAY_OBJ {
-				return newError("first argument to 'join' must be ARRAY, got %s", args[0].Type())
-			}
-
-			if args[1].Type() != object.STRING_OBJ {
-				return newError("second argument to 'join' must be STRING, got %s", args[1].Type())
-			}
-
-			array := args[0].(*object.Array)
-			sep := args[1].(*object.String).Value
-
-			strElements := make([]string, len(array.Elements))
-			for i, elem := range array.Elements {
-				strElements[i] = elem.Inspect()
-			}
-
-			var result strings.Builder
-			for i, strElem := range strElements {
-				result.WriteString(strElem)
-				if i < len(strElements)-1 {
-					result.WriteString(sep)
-				}
-			}
-
-			return &object.String{Value: result.String()}
 		},
 	},
 }
