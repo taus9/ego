@@ -192,6 +192,15 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
+	"puts": {
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				print(arg.Inspect())
+			}
+			return NIL
+		},
+	},
+
 	"str": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
