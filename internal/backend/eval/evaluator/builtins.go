@@ -141,6 +141,26 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
+	"input": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) > 1 {
+				return newError("wrong number of arguments. got=%d, want=0 or 1", len(args))
+			}
+
+			if len(args) == 1 {
+				print(args[0].Inspect())
+			}
+
+			var input string
+			_, err := fmt.Scanln(&input)
+			if err != nil {
+				return newError("error reading input: %s", err.Error())
+			}
+
+			return &object.String{Value: input}
+		},
+	},
+
 	"int": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
