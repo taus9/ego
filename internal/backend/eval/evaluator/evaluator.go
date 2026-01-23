@@ -34,8 +34,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.IfBlockExpression:
 		currentToken = node.Token
-		blockEnv := object.NewEnclosedEnvironment(env)
-		return evalIfBlockExpression(node, blockEnv)
+		return evalIfBlockExpression(node, env)
 
 	case *ast.IfTernaryExpression:
 		currentToken = node.Token
@@ -80,9 +79,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isReservedWord(node.Name.Value) {
 			return newError("cannot use reserved word as identifier: %s", node.Name.Value)
 		}
-		// if env.InCurrentScope(node.Name.Value) {
-		// 	return newError("identifier already declared in current scope: %s", node.Name.Value)
-		// }
+
 		val := Eval(node.Value, env)
 		if isError(val) {
 			return val
@@ -91,7 +88,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			// discard value assigned to underscore
 			return NIL
 		}
-		env.Set(node.Name.Value, val)
+		if !env.Declare(node.Name.Value, val) {
+			return newError("identifier already declared in current scope: %s", node.Name.Value)
+		}
 
 	case *ast.AssignStatement:
 		currentToken = node.Token
@@ -176,7 +175,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		for isTruthy(conditionObj) {
-			evalResult := Eval(node.Body, env)
+			evalResult := evalBlockStatement(node.Body, env)
 			if isError(evalResult) {
 				return evalResult
 			}
@@ -209,13 +208,15 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return newError("FOR loop bounds must be integers")
 		}
 
+		// the iterator must be set in the env outside the for block
+		// so that it can be constant through out the whole loop
+		// once we are done with the loop it should be deleted
 		defer env.Delete(node.Iterator.Value)
 
 		if startInt.Value <= endInt.Value {
 			for i := startInt.Value; i <= endInt.Value; i++ {
 				env.Set(node.Iterator.Value, &object.Integer{Value: i})
-				blockEnv := object.NewEnclosedEnvironment(env)
-				evalResult := Eval(node.Body, blockEnv)
+				evalResult := evalBlockStatement(node.Body, env)
 				if isError(evalResult) {
 					return evalResult
 				}
@@ -230,8 +231,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		} else {
 			for i := startInt.Value; i >= endInt.Value; i-- {
 				env.Set(node.Iterator.Value, &object.Integer{Value: i})
-				blockEnv := object.NewEnclosedEnvironment(env)
-				evalResult := evalBlockStatement(node.Body, blockEnv)
+				evalResult := evalBlockStatement(node.Body, env)
 				if isError(evalResult) {
 					return evalResult
 				}
@@ -252,6 +252,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return iterableObj
 		}
 
+		// just like with the for to loop declared iterators must
+		// be removed from the env outside the for block
+		// once the loop is finished
 		defer env.Delete(node.Index.Value)
 		defer env.Delete(node.Value.Value)
 
@@ -265,8 +268,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					env.Set(node.Value.Value, &object.String{Value: string(ch)})
 				}
 
-				blockEnv := object.NewEnclosedEnvironment(env)
-				evalResult := evalBlockStatement(node.Body, blockEnv)
+				evalResult := evalBlockStatement(node.Body, env)
 
 				if isError(evalResult) {
 					return evalResult
@@ -288,8 +290,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					env.Set(node.Value.Value, element)
 				}
 
-				blockEnv := object.NewEnclosedEnvironment(env)
-				evalResult := evalBlockStatement(node.Body, blockEnv)
+				evalResult := evalBlockStatement(node.Body, env)
 
 				if isError(evalResult) {
 					return evalResult
@@ -311,8 +312,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					env.Set(node.Value.Value, pair.Value)
 				}
 
-				blockEnv := object.NewEnclosedEnvironment(env)
-				evalResult := evalBlockStatement(node.Body, blockEnv)
+				evalResult := evalBlockStatement(node.Body, env)
 
 				if isError(evalResult) {
 					return evalResult
@@ -340,7 +340,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.FunctionStatement:
 		currentToken = node.Token
 		function := &object.Function{Parameters: node.Parameters, Body: node.Body, Env: env}
-		env.Set(node.Name.Value, function)
+		if !env.Declare(node.Name.Value, function) {
+			return newError("function already declared in current scope: %s", node.Name.Value)
+		}
 
 	case *ast.AnonymousFunction:
 		currentToken = node.Token
@@ -402,10 +404,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			unhandledError, _ := tryObj.(*object.UnhandledError)
 			errorObj := createErrorObject(unhandledError)
 
-			blockEnv := object.NewEnclosedEnvironment(env)
-			blockEnv.Set("$E", errorObj)
+			env.Set("$E", errorObj)
+			defer env.Delete("$E")
 
-			result := Eval(node.ElseBlock, blockEnv)
+			result := evalBlockStatement(node.ElseBlock, env)
 
 			return result
 		}
@@ -457,18 +459,6 @@ func isReservedWord(word string) bool {
 	_, ok := builtins[word]
 	return slices.Contains(reservedWords, word) || ok
 }
-
-// func syncEnvChanges(parentEnv, childEnv *object.Environment) {
-// 	var mu sync.Mutex
-// 	mu.Lock()
-// 	defer mu.Unlock()
-
-// 	for key, val := range childEnv.GetStore() {
-// 		if parentEnv.Exists(key) {
-// 			parentEnv.Set(key, val)
-// 		}
-// 	}
-// }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
 	if input {
@@ -645,9 +635,9 @@ func evalIfBlockExpression(ie *ast.IfBlockExpression, env *object.Environment) o
 	}
 
 	if isTruthy(condition) {
-		return Eval(ie.Consequence, env)
+		return evalBlockStatement(ie.Consequence, env)
 	} else if ie.Alternative != nil {
-		return Eval(ie.Alternative, env)
+		return evalBlockStatement(ie.Alternative, env)
 	} else {
 		return NIL
 	}
@@ -661,9 +651,11 @@ func evalIfTernaryExpression(ie *ast.IfTernaryExpression, env *object.Environmen
 	}
 
 	if isTruthy(condition) {
-		return Eval(ie.Consequence, env)
+		conditionEnv := object.NewEnclosedEnvironment(env)
+		return Eval(ie.Consequence, conditionEnv)
 	} else if ie.Alternative != nil {
-		return Eval(ie.Alternative, env)
+		conditionEnv := object.NewEnclosedEnvironment(env)
+		return Eval(ie.Alternative, conditionEnv)
 	} else {
 		return NIL
 	}
@@ -684,9 +676,9 @@ func isTruthy(obj object.Object) bool {
 
 func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {
 	var result object.Object
-
+	blockEnv := object.NewEnclosedEnvironment(env)
 	for _, statement := range block.Statements {
-		result = Eval(statement, env)
+		result = Eval(statement, blockEnv)
 
 		if result != nil {
 			rt := result.Type()
