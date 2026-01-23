@@ -120,30 +120,40 @@ func NewEnvironment() *Environment {
 	return &Environment{store: s, outer: nil}
 }
 
-func (e *Environment) Get(name string) (Object, bool) {
-	obj, ok := e.store[name]
-	if !ok && e.outer != nil {
-		obj, ok = e.outer.Get(name)
+func (e *Environment) Declare(name string, val Object) bool {
+	_, ok := e.store[name]
+	if ok {
+		return false
 	}
-	return obj, ok
-}
-
-func (e *Environment) Set(name string, val Object) Object {
 	e.store[name] = val
-	return val
+	return true
 }
 
-func (e *Environment) InCurrentScope(name string) bool {
-	_, ok := e.store[name]
-	return ok
-}
-
-func (e *Environment) Exists(name string) bool {
-	_, ok := e.store[name]
-	if !ok && e.outer != nil {
-		return e.outer.Exists(name)
+func (e *Environment) Set(name string, val Object) bool {
+	env, ok := e.Resolve(name)
+	if !ok {
+		return false
 	}
-	return ok
+	env.store[name] = val
+	return true
+}
+
+func (e *Environment) Get(name string) (Object, bool) {
+	env, ok := e.Resolve(name)
+	if !ok {
+		return nil, false
+	}
+	return env.store[name], true
+}
+
+func (e *Environment) Resolve(name string) (*Environment, bool) {
+	for cur := e; cur != nil; cur = cur.outer {
+		_, ok := cur.store[name]
+		if ok {
+			return cur, true
+		}
+	}
+	return nil, false
 }
 
 func (e *Environment) Delete(name string) {
