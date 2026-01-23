@@ -80,7 +80,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isReservedWord(node.Name.Value) {
 			return newError("cannot use reserved word as identifier: %s", node.Name.Value)
 		}
-		if env.Exists(node.Name.Value) {
+		if env.InCurrentScope(node.Name.Value) {
 			return newError("identifier already declared in current scope: %s", node.Name.Value)
 		}
 		val := Eval(node.Value, env)

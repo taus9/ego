@@ -133,6 +133,11 @@ func (e *Environment) Set(name string, val Object) Object {
 	return val
 }
 
+func (e *Environment) InCurrentScope(name string) bool {
+	_, ok := e.store[name]
+	return ok
+}
+
 func (e *Environment) Exists(name string) bool {
 	_, ok := e.store[name]
 	if !ok && e.outer != nil {
