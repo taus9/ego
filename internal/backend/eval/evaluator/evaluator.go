@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
-	"sync"
 )
 
 var reservedWords = []string{
@@ -35,7 +34,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	case *ast.IfBlockExpression:
 		currentToken = node.Token
-		return evalIfBlockExpression(node, env)
+		blockEnv := object.NewEnclosedEnvironment(env)
+		return evalIfBlockExpression(node, blockEnv)
 
 	case *ast.IfTernaryExpression:
 		currentToken = node.Token
@@ -80,9 +80,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if isReservedWord(node.Name.Value) {
 			return newError("cannot use reserved word as identifier: %s", node.Name.Value)
 		}
-		if env.InCurrentScope(node.Name.Value) {
-			return newError("identifier already declared in current scope: %s", node.Name.Value)
-		}
+		// if env.InCurrentScope(node.Name.Value) {
+		// 	return newError("identifier already declared in current scope: %s", node.Name.Value)
+		// }
 		val := Eval(node.Value, env)
 		if isError(val) {
 			return val
@@ -99,9 +99,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		if node.Name != nil {
 			// simple variable assignment
 			assignName = node.Name.Value
-			if !env.Exists(assignName) {
-				return newError("identifier not declared: %s", assignName)
-			}
 
 			if !node.Name.Mutable {
 				return newError("cannot assign to constant: %s", assignName)
@@ -115,7 +112,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				// discard value assigned to underscore
 				return NIL
 			}
-			env.Set(assignName, val)
+			if !env.Set(assignName, val) {
+				return newError("identifier not declared: %s", assignName)
+			}
 
 		} else if node.Index != nil {
 			// array index assignment
@@ -124,10 +123,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				return newError("invalid assignment target")
 			}
 			assignName = indexExp.Left.(*ast.Identifier).Value
-
-			if !env.Exists(assignName) {
-				return newError("identifier not declared: %s", assignName)
-			}
 
 			indexObj := Eval(indexExp.Index, env)
 			if isError(indexObj) {
@@ -147,7 +142,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					return valueObj
 				}
 				iteratorObj.Pairs[key.(object.Hashable).HasKey()] = object.MapPair{Key: key, Value: valueObj}
-				env.Set(assignName, iteratorObj)
+				if !env.Set(assignName, iteratorObj) {
+					return newError("identifier not declared: %s", assignName)
+				}
 
 			case *object.Array:
 				// array index assignment
@@ -163,7 +160,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					return valueObj
 				}
 				iteratorObj.Elements[indexInt.Value] = valueObj
-				env.Set(assignName, iteratorObj)
+				if !env.Set(assignName, iteratorObj) {
+					return newError("identifier not declared: %s", assignName)
+				}
 
 			default:
 				return newError("index assignment not supported for type: %s", leftObj.Type())
@@ -221,8 +220,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					return evalResult
 				}
 
-				syncEnvChanges(env, blockEnv)
-
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -238,8 +235,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				if isError(evalResult) {
 					return evalResult
 				}
-
-				syncEnvChanges(env, blockEnv)
 
 				if _, ok := evalResult.(*object.Break); ok {
 					break
@@ -277,8 +272,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					return evalResult
 				}
 
-				syncEnvChanges(env, blockEnv)
-
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -302,8 +295,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					return evalResult
 				}
 
-				syncEnvChanges(env, blockEnv)
-
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -326,8 +317,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				if isError(evalResult) {
 					return evalResult
 				}
-
-				syncEnvChanges(env, blockEnv)
 
 				if _, ok := evalResult.(*object.Break); ok {
 					break
@@ -399,7 +388,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			blockEnv.Set("$E", errorObj)
 
 			result := Eval(node.ElseExpression, blockEnv)
-			syncEnvChanges(env, blockEnv)
+
 			return result
 		}
 
@@ -417,7 +406,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			blockEnv.Set("$E", errorObj)
 
 			result := Eval(node.ElseBlock, blockEnv)
-			syncEnvChanges(env, blockEnv)
+
 			return result
 		}
 
@@ -469,17 +458,17 @@ func isReservedWord(word string) bool {
 	return slices.Contains(reservedWords, word) || ok
 }
 
-func syncEnvChanges(parentEnv, childEnv *object.Environment) {
-	var mu sync.Mutex
-	mu.Lock()
-	defer mu.Unlock()
+// func syncEnvChanges(parentEnv, childEnv *object.Environment) {
+// 	var mu sync.Mutex
+// 	mu.Lock()
+// 	defer mu.Unlock()
 
-	for key, val := range childEnv.GetStore() {
-		if parentEnv.Exists(key) {
-			parentEnv.Set(key, val)
-		}
-	}
-}
+// 	for key, val := range childEnv.GetStore() {
+// 		if parentEnv.Exists(key) {
+// 			parentEnv.Set(key, val)
+// 		}
+// 	}
+// }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
 	if input {
