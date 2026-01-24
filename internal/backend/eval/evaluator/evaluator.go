@@ -17,9 +17,12 @@ var reservedWords = []string{
 var currentToken token.Token
 
 var (
-	NIL   = &object.Nil{}
-	TRUE  = &object.Boolean{Value: true}
-	FALSE = &object.Boolean{Value: false}
+	NIL          = &object.Nil{}
+	TRUE         = &object.Boolean{Value: true}
+	FALSE        = &object.Boolean{Value: false}
+	ZERO_INT     = &object.Integer{Value: 0}
+	ZERO_FLOAT   = &object.Float{Value: 0.0}
+	EMPTY_STRING = &object.String{Value: ""}
 )
 
 func Eval(node ast.Node, env *object.Environment) object.Object {
@@ -496,6 +499,21 @@ func evalPrefixExpression(operator string, right object.Object) object.Object {
 }
 
 func evalBangOperatorExpression(right object.Object) object.Object {
+	intObj, ok := right.(*object.Integer)
+	if ok {
+		return nativeBoolToBooleanObject(intObj.Value == 0)
+	}
+
+	floatObj, ok := right.(*object.Float)
+	if ok {
+		return nativeBoolToBooleanObject(floatObj.Value == 0.0)
+	}
+
+	strObj, ok := right.(*object.String)
+	if ok {
+		return nativeBoolToBooleanObject(strObj.Value == "")
+	}
+
 	switch right {
 	case TRUE:
 		return FALSE
@@ -668,18 +686,27 @@ func evalIfTernaryExpression(ie *ast.IfTernaryExpression, env *object.Environmen
 }
 
 func isTruthy(obj object.Object) bool {
+	intObj, ok := obj.(*object.Integer)
+	if ok {
+		return intObj.Value != 0
+	}
+
+	floatObj, ok := obj.(*object.Float)
+	if ok {
+		return floatObj.Value != 0.0
+	}
+
+	strObj, ok := obj.(*object.String)
+	if ok {
+		return strObj.Value != ""
+	}
+
 	switch obj {
 	case NIL:
 		return false
 	case TRUE:
 		return true
 	case FALSE:
-		return false
-	case &object.Integer{Value: 0}:
-		return false
-	case &object.Float{Value: 0.0}:
-		return false
-	case &object.String{Value: ""}:
 		return false
 
 	default:
