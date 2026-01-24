@@ -417,6 +417,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		return tryObj
 
+	case *ast.WhenExpression:
+		return evalWhenExpression(node, env)
+
 	case *ast.MapLiteral:
 		currentToken = node.Token
 		return evalMapLiteral(node, env)
@@ -649,6 +652,101 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
+}
+
+func evalWhenExpression(we *ast.WhenExpression, env *object.Environment) object.Object {
+	selector := Eval(we.Selector, env)
+
+	if isError(selector) {
+		return selector
+	}
+
+	for _, caseClause := range we.Cases {
+		caseValue := Eval(caseClause.Condition, env)
+		if isError(caseValue) {
+			return caseValue
+		}
+
+		switch caseValue.Type() {
+		case object.ARRAY_OBJ:
+			arrayObj := caseValue.(*object.Array)
+			matched := false
+			for _, element := range arrayObj.Elements {
+				equalObj := evalInfixExpression("==", selector, element)
+				if isError(equalObj) {
+					return equalObj
+				}
+				if isTruthy(equalObj) {
+					matched = true
+					break
+				}
+			}
+			if matched {
+				return evalBlockStatement(caseClause.Block, env)
+			}
+			continue
+
+		case object.MAP_OBJ:
+			mapObj := caseValue.(*object.Map)
+			matched := false
+			for _, pair := range mapObj.Pairs {
+				equalObj := evalInfixExpression("==", selector, pair.Value)
+				if isError(equalObj) {
+					return equalObj
+				}
+				if isTruthy(equalObj) {
+					matched = true
+					break
+				}
+			}
+			if matched {
+				return evalBlockStatement(caseClause.Block, env)
+			}
+			continue
+
+		case object.ERROR_OBJ:
+			errorObj := caseValue.(*object.Error)
+			matched := false
+			for _, pair := range errorObj.Pairs {
+				equalObj := evalInfixExpression("==", selector, pair.Value)
+				if isError(equalObj) {
+					return equalObj
+				}
+				if isTruthy(equalObj) {
+					matched = true
+					break
+				}
+			}
+			if matched {
+				return evalBlockStatement(caseClause.Block, env)
+			}
+			continue
+
+		case object.NIL_OBJ:
+			if selector.Type() == object.NIL_OBJ {
+				return evalBlockStatement(caseClause.Block, env)
+			}
+			continue
+
+		default:
+			equalObj := evalInfixExpression("==", selector, caseValue)
+			if isError(equalObj) {
+				return equalObj
+			}
+			if isTruthy(equalObj) {
+				return evalBlockStatement(caseClause.Block, env)
+			}
+			continue
+		}
+
+	}
+
+	if we.ElseBlock != nil {
+		return evalBlockStatement(we.ElseBlock, env)
+	}
+
+	return NIL
+
 }
 
 func evalIfBlockExpression(ie *ast.IfBlockExpression, env *object.Environment) object.Object {
