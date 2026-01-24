@@ -46,6 +46,7 @@ func TestNextToken(t *testing.T) {
 	$PI := 3.14159
 	$ myVar
 	{}
+	when is
 	`
 
 	tests := []struct {
@@ -216,6 +217,9 @@ func TestNextToken(t *testing.T) {
 		{token.EOL, "\n"},
 		{token.LBRACE, "{"},
 		{token.RBRACE, "}"},
+		{token.EOL, "\n"},
+		{token.WHEN, "when"},
+		{token.IS, "is"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}

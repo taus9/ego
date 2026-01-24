@@ -74,6 +74,8 @@ const (
 	OR     = "OR"    // - p
 	BREAK  = "BREAK" // - p
 	AGAIN  = "AGAIN" // - p
+	WHEN   = "WHEN"
+	IS     = "IS"
 
 	// used internally by the parsers
 	ASSIGN_INTERNAL  = "$ASSIGN"
@@ -94,6 +96,8 @@ var keywords = map[string]TokenType{
 	"or":    OR,
 	"break": BREAK,
 	"again": AGAIN,
+	"when":  WHEN,
+	"is":    IS,
 }
 
 func LookupIdent(ident string) TokenType {
