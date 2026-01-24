@@ -529,6 +529,12 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 		return nativeBoolToBooleanObject(isTruthy(left) || isTruthy(right))
 
 	case left.Type() == object.FLOAT_OBJ || right.Type() == object.FLOAT_OBJ:
+		if left.Type() != object.FLOAT_OBJ && left.Type() != object.INTEGER_OBJ {
+			return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
+		}
+		if right.Type() != object.FLOAT_OBJ && right.Type() != object.INTEGER_OBJ {
+			return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
+		}
 		return evalFloatInfixExpression(operator, left, right)
 
 	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
