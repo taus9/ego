@@ -45,7 +45,6 @@ func run(source string) {
 	p := parser.New(l)
 
 	program := p.ParseProgram()
-	println(program.String())
 
 	if p.ParseError() != nil {
 		printParserErrors(os.Stdout, p.ParseError())
