@@ -45,6 +45,7 @@ func run(source string) {
 	p := parser.New(l)
 
 	program := p.ParseProgram()
+	println(program.String())
 
 	if p.ParseError() != nil {
 		printParserErrors(os.Stdout, p.ParseError())
@@ -129,6 +130,12 @@ func stackTraceItemToString(item int) string {
 		return "FOR LOOP"
 	case parser.ASSIGN:
 		return "ASSIGNMENT"
+	case parser.WHEN:
+		return "WHEN"
+	case parser.IS:
+		return "IS"
+	case parser.ELSE:
+		return "ELSE"
 	default:
 		return "UNKNOWN"
 	}
