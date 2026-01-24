@@ -558,18 +558,18 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
 		return evalIntegerInfixExpression(operator, left, right)
 
+	case left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ:
+		return evalStringInfixExpression(operator, left, right)
+
+	case left.Type() != right.Type():
+		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
+
 	case operator == "==":
+
 		return nativeBoolToBooleanObject(left == right)
 
 	case operator == "!=":
 		return nativeBoolToBooleanObject(left != right)
-
-	case left.Type() != right.Type():
-
-		return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
-
-	case left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ:
-		return evalStringInfixExpression(operator, left, right)
 
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
@@ -807,6 +807,19 @@ func unwrapReturnValue(obj object.Object) object.Object {
 }
 
 func evalStringInfixExpression(operator string, left, right object.Object) object.Object {
+
+	if operator == "==" {
+		leftStr := left.(*object.String).Value
+		rightStr := right.(*object.String).Value
+		return nativeBoolToBooleanObject(leftStr == rightStr)
+	}
+
+	if operator == "!=" {
+		leftStr := left.(*object.String).Value
+		rightStr := right.(*object.String).Value
+		return nativeBoolToBooleanObject(leftStr != rightStr)
+	}
+
 	if operator != "+" {
 		return newError("unknown operator: STRING %s STRING", operator)
 	}
