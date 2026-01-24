@@ -22,6 +22,8 @@ const (
 	FOR
 	ASSIGN
 	ELSE
+	WHEN
+	IS
 )
 
 const (
@@ -101,6 +103,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.STRING, p.parseStringLiteral)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 	p.registerPrefix(token.LBRACE, p.parseMapLiteral)
+	p.registerPrefix(token.WHEN, p.parseWhenExpression)
 
 	// unexpected tokens
 	p.registerPrefix(token.EOL, p.parseUnexpectedTokenError)
@@ -128,7 +131,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.TO, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.AND, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.OR, p.parseUnexpectedTokenError)
-
+	p.registerPrefix(token.IS, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.ILLEGAL, p.parseIllegalTokenError)
 
 	p.registerPrefix(token.END_BLOCK, p.unexpectedEndBlockStatement)
