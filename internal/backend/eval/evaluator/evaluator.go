@@ -675,6 +675,13 @@ func isTruthy(obj object.Object) bool {
 		return true
 	case FALSE:
 		return false
+	case &object.Integer{Value: 0}:
+		return false
+	case &object.Float{Value: 0.0}:
+		return false
+	case &object.String{Value: ""}:
+		return false
+
 	default:
 		return true
 	}
