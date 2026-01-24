@@ -11,7 +11,7 @@ import (
 
 var reservedWords = []string{
 	"nil",
-	"$E",
+	"$e",
 }
 
 var currentToken token.Token
@@ -390,7 +390,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			errorObj := createErrorObject(unhandledError)
 
 			blockEnv := object.NewEnclosedEnvironment(env)
-			blockEnv.Declare("$E", errorObj)
+			blockEnv.Declare("$e", errorObj)
 
 			result := Eval(node.ElseExpression, blockEnv)
 
@@ -407,8 +407,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			unhandledError, _ := tryObj.(*object.UnhandledError)
 			errorObj := createErrorObject(unhandledError)
 
-			env.Declare("$E", errorObj)
-			defer env.Delete("$E")
+			env.Declare("$e", errorObj)
+			defer env.Delete("$e")
 
 			result := evalBlockStatement(node.ElseBlock, env)
 
