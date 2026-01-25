@@ -5,6 +5,7 @@ import (
 	"ego/internal/frontend/token"
 )
 
+// I'm proud of this one
 func (p *Parser) parseWhenExpression() ast.Expression {
 	p.stackTrace.Push(WHEN)
 
