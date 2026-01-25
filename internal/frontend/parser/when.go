@@ -78,7 +78,7 @@ func (p *Parser) parseWhenExpression() ast.Expression {
 		case token.ELSE:
 			p.stackTrace.Push(ELSE)
 			if hasElse {
-				p.createErrorMessage("only one ELSE block allowed in WHEN expression")
+				p.createErrorMessage("ELSE block already defined for WHEN expression")
 				return nil
 			}
 
