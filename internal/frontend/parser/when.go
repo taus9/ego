@@ -81,13 +81,12 @@ func (p *Parser) parseWhenExpression() ast.Expression {
 				return nil
 			}
 
-			// p.nextToken()
+			elseToken := p.curToken
 
 			if p.peekTokenIs(token.LBRACE) {
 				p.nextToken() // advance to LBRACE
-				elsePlaceholder := token.Token{Type: token.ELSE, Literal: "else"}
 
-				expression.ElseBlock = p.parseSingleLineBlockStatement(elsePlaceholder)
+				expression.ElseBlock = p.parseSingleLineBlockStatement(elseToken)
 
 				if p.errorExist() {
 					return nil

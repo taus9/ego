@@ -8,10 +8,11 @@ import (
 func (p *Parser) parseElseExpression(tryExpr ast.Expression) ast.Expression {
 	p.stackTrace.Push(ELSE)
 
+	elseToken := p.curToken
 	p.nextToken() // consume ELSE
 
 	if p.curTokenIs(token.EOL) {
-		return p.parseElseBlockExpression(tryExpr)
+		return p.parseElseBlockExpression(tryExpr, elseToken)
 	}
 
 	expression := p.parseExpression(LOWEST)
@@ -23,15 +24,15 @@ func (p *Parser) parseElseExpression(tryExpr ast.Expression) ast.Expression {
 	p.stackTrace.Pop()
 
 	return &ast.ElseInlineExpression{
-		Token:          token.Token{Type: token.ELSE, Literal: "else"},
+		Token:          elseToken,
 		TryExpression:  tryExpr,
 		ElseExpression: expression,
 	}
 }
 
-func (p *Parser) parseElseBlockExpression(tryExpr ast.Expression) ast.Expression {
+func (p *Parser) parseElseBlockExpression(tryExpr ast.Expression, elseToken token.Token) ast.Expression {
 	expression := &ast.ElseBlockExpression{
-		Token:         token.Token{Type: token.ELSE, Literal: "else"},
+		Token:         elseToken,
 		TryExpression: tryExpr,
 	}
 

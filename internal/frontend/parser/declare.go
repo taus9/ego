@@ -7,7 +7,7 @@ import (
 
 func (p *Parser) parseDeclareStatement() *ast.DeclareStatement {
 	p.stackTrace.Push(DECLARE)
-	stmt := &ast.DeclareStatement{Token: token.Token{Type: token.DECLARE, Literal: token.DECLARE_INTERNAL}}
+	stmt := &ast.DeclareStatement{Token: p.peekToken}
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 	if p.curTokenIs(token.CONST) {

@@ -12,7 +12,7 @@ func (p *Parser) parseIfExpression() ast.Expression {
 		p.createErrorMessage("expected expression after IF")
 		return nil
 	}
-
+	ifToken := p.curToken
 	p.nextToken() // consume IF
 
 	condition := p.parseExpression(LOWEST)
@@ -23,21 +23,21 @@ func (p *Parser) parseIfExpression() ast.Expression {
 
 	if p.peekTokenIs(token.EOL) {
 		p.nextToken()
-		return p.parseIfBlockExpression(condition)
+		return p.parseIfBlockExpression(condition, ifToken)
 	}
 
 	if p.peekTokenIs(token.LBRACE) {
 		p.nextToken()
-		return p.parseIfTernaryExpression(condition)
+		return p.parseIfTernaryExpression(condition, ifToken)
 	}
 
 	p.createErrorMessage("invalid if expression")
 	return nil
 }
 
-func (p *Parser) parseIfBlockExpression(condition ast.Expression) ast.Expression {
+func (p *Parser) parseIfBlockExpression(condition ast.Expression, ifToken token.Token) ast.Expression {
 	expression := &ast.IfBlockExpression{
-		Token:     token.Token{Type: token.IF, Literal: "if"},
+		Token:     ifToken,
 		Condition: condition,
 	}
 
@@ -80,9 +80,9 @@ func (p *Parser) parseIfBlockExpression(condition ast.Expression) ast.Expression
 	return expression
 }
 
-func (p *Parser) parseIfTernaryExpression(condition ast.Expression) ast.Expression {
+func (p *Parser) parseIfTernaryExpression(condition ast.Expression, ifToken token.Token) ast.Expression {
 	expression := &ast.IfTernaryExpression{
-		Token:     token.Token{Type: token.IF, Literal: "if"},
+		Token:     ifToken,
 		Condition: condition,
 	}
 

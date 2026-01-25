@@ -15,21 +15,22 @@ for <ident> = <exp> to <exp>
 
 func (p *Parser) parseForStatement() ast.Statement {
 	p.stackTrace.Push(FOR)
+	forToken := p.curToken
 	p.nextToken() // consume 'for' token
 
 	if p.curTokenIs(token.IDENT) && p.peekTokenIs(token.DECLARE) {
-		return p.parseForToStatement()
+		return p.parseForToStatement(forToken)
 	}
 
 	if p.curTokenIs(token.IDENT) && p.peekTokenIs(token.COMMA) {
-		return p.parseForInStatement()
+		return p.parseForInStatement(forToken)
 	}
 
-	return p.parseForWhileStatement()
+	return p.parseForWhileStatement(forToken)
 }
 
-func (p *Parser) parseForWhileStatement() *ast.ForWhileStatement {
-	fws := &ast.ForWhileStatement{Token: token.Token{Type: token.FOR, Literal: "for"}}
+func (p *Parser) parseForWhileStatement(forToken token.Token) *ast.ForWhileStatement {
+	fws := &ast.ForWhileStatement{Token: forToken}
 
 	condition := p.parseExpression(LOWEST)
 
@@ -59,8 +60,8 @@ func (p *Parser) parseForWhileStatement() *ast.ForWhileStatement {
 	return fws
 }
 
-func (p *Parser) parseForToStatement() *ast.ForToStatement {
-	fts := &ast.ForToStatement{Token: token.Token{Type: token.FOR, Literal: "for"}}
+func (p *Parser) parseForToStatement(forToken token.Token) *ast.ForToStatement {
+	fts := &ast.ForToStatement{Token: forToken}
 	fts.Iterator = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 	p.nextToken() // consume identifier
@@ -114,8 +115,8 @@ func (p *Parser) parseForToStatement() *ast.ForToStatement {
 	return fts
 }
 
-func (p *Parser) parseForInStatement() *ast.ForInStatement {
-	fis := &ast.ForInStatement{Token: token.Token{Type: token.FOR, Literal: "for"}}
+func (p *Parser) parseForInStatement(forToken token.Token) *ast.ForInStatement {
+	fis := &ast.ForInStatement{Token: forToken}
 	fis.Index = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 	p.nextToken() // consume index identifier

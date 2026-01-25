@@ -7,7 +7,8 @@ import (
 
 func (p *Parser) parseAssignStatement(exp ast.Expression) *ast.AssignStatement {
 	p.stackTrace.Push(ASSIGN)
-	assignStmt := &ast.AssignStatement{Token: token.Token{Type: token.ASSIGN, Literal: token.ASSIGN_INTERNAL}}
+
+	assignStmt := &ast.AssignStatement{Token: p.curToken}
 
 	switch node := exp.(type) {
 	case *ast.Identifier:
