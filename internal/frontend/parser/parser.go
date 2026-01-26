@@ -177,6 +177,7 @@ func (p *Parser) nextToken() {
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
+
 	p.stackTrace.Push(PROGRAM)
 
 	for p.curToken.Type != token.EOF {
@@ -194,6 +195,9 @@ func (p *Parser) ParseProgram() *ast.Program {
 		p.nextToken()
 	}
 
+	program.Statements = p.createProtoMainSetup(program.Statements)
+
+	p.stackTrace.Pop()
 	return program
 }
 
@@ -252,6 +256,40 @@ func (p *Parser) parseStatement() ast.Statement {
 	default:
 		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) createProtoMainSetup(statements []ast.Statement) []ast.Statement {
+	protoMainFunction := &ast.FunctionStatement{
+		Token: token.Token{
+			Type:    token.IDENT,
+			Literal: "$PROTO_MAIN",
+		},
+
+		Name: &ast.Identifier{
+			Token: token.Token{Type: token.IDENT, Literal: "$PROTO_MAIN"},
+			Value: "$PROTO_MAIN",
+		},
+
+		Parameters: []*ast.Identifier{},
+
+		Body: &ast.BlockStatement{
+			Token:      token.Token{Type: token.BEGIN_INTERNAL, Literal: token.BEGIN_INTERNAL},
+			Statements: statements,
+		},
+	}
+
+	protoMainFunctionCall := &ast.CallExpression{
+		Token:     token.Token{Type: token.LPAREN, Literal: "("},
+		Function:  protoMainFunction.Name,
+		Arguments: []ast.Expression{},
+	}
+
+	protoMainFunctionCallStmt := &ast.ExpressionStatement{
+		Token:      protoMainFunctionCall.Token,
+		Expression: protoMainFunctionCall,
+	}
+
+	return []ast.Statement{protoMainFunction, protoMainFunctionCallStmt}
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {
