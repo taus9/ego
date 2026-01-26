@@ -60,37 +60,6 @@ func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	return block
 }
 
-func (p *Parser) parseSingleLineBlockStatement(tok token.Token) *ast.BlockStatement {
-	p.stackTrace.Push(BLOCK)
-	block := &ast.BlockStatement{
-		Token: token.Token{Type: token.BEGIN_INTERNAL,
-			Literal: token.BEGIN_INTERNAL,
-		},
-	}
-	block.Statements = []ast.Statement{}
-
-	p.nextToken() // consume {
-
-	expression := p.parseExpression(LOWEST)
-
-	if p.errorExist() {
-		return nil
-	}
-
-	if !p.peekTokenIs(token.RBRACE) {
-		p.createErrorMessage("Expected } after single line IS expression")
-		return nil
-	}
-
-	p.nextToken() // advance to }
-
-	stmt := &ast.ExpressionStatement{Token: tok, Expression: expression}
-	block.Statements = append(block.Statements, stmt)
-
-	p.stackTrace.Pop()
-	return block
-}
-
 func (p *Parser) unexpectedEndBlockStatement() ast.Expression {
 	// this function currently just prevents nonsense parsing errors
 	// END_BLOCK token already consumed in parseBlockStatement

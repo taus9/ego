@@ -40,10 +40,10 @@ func (p *Parser) parseWhenExpression() ast.Expression {
 			}
 
 			// IS single line statement
-			if p.peekTokenIs(token.LBRACE) {
-				p.nextToken() // advance to LBRACE
+			if p.peekTokenIs(token.COLON) {
+				p.nextToken() // advance to COLON
 
-				whenCase.Block = p.parseSingleLineBlockStatement(whenCase.Token)
+				whenCase.Block = p.parseSingleLineWhenCase(whenCase.Token)
 
 				if p.errorExist() {
 					return nil
@@ -84,10 +84,10 @@ func (p *Parser) parseWhenExpression() ast.Expression {
 
 			elseToken := p.curToken
 
-			if p.peekTokenIs(token.LBRACE) {
-				p.nextToken() // advance to LBRACE
+			if p.peekTokenIs(token.COLON) {
+				p.nextToken() // advance to COLON
 
-				expression.ElseBlock = p.parseSingleLineBlockStatement(elseToken)
+				expression.ElseBlock = p.parseSingleLineWhenCase(elseToken)
 
 				if p.errorExist() {
 					return nil
@@ -113,7 +113,7 @@ func (p *Parser) parseWhenExpression() ast.Expression {
 				continue
 			}
 
-			p.createErrorMessage("only { or EOL allowed after IS condition")
+			p.createErrorMessage("only : or EOL allowed after IS condition")
 			return nil
 
 		case token.EOL:
@@ -137,4 +137,35 @@ func (p *Parser) parseWhenExpression() ast.Expression {
 
 	p.stackTrace.Pop()
 	return expression
+}
+
+func (p *Parser) parseSingleLineWhenCase(tok token.Token) *ast.BlockStatement {
+	p.stackTrace.Push(BLOCK)
+	block := &ast.BlockStatement{
+		Token: token.Token{Type: token.BEGIN_INTERNAL,
+			Literal: token.BEGIN_INTERNAL,
+		},
+	}
+	block.Statements = []ast.Statement{}
+
+	p.nextToken() // consume :
+
+	expression := p.parseExpression(LOWEST)
+
+	if p.errorExist() {
+		return nil
+	}
+
+	if !p.peekTokenIs(token.EOL) {
+		p.createErrorMessage("Expected EOL after single line WHEN case")
+		return nil
+	}
+
+	p.nextToken() // advance to EOL
+
+	stmt := &ast.ExpressionStatement{Token: tok, Expression: expression}
+	block.Statements = append(block.Statements, stmt)
+
+	p.stackTrace.Pop()
+	return block
 }
