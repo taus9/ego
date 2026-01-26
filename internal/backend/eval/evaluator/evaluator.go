@@ -214,6 +214,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		// the iterator must be set in the env outside the for block
 		// so that it can be constant through out the whole loop
 		// once we are done with the loop it should be deleted
+		env.Declare(node.Iterator.Value, startInt)
 		defer env.Delete(node.Iterator.Value)
 
 		if startInt.Value <= endInt.Value {
@@ -258,6 +259,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		// just like with the for to loop declared iterators must
 		// be removed from the env outside the for block
 		// once the loop is finished
+		env.Declare(node.Index.Value, NIL)
+		env.Declare(node.Value.Value, NIL)
 		defer env.Delete(node.Index.Value)
 		defer env.Delete(node.Value.Value)
 
@@ -891,7 +894,7 @@ func extendFunctionEnv(fn *object.Function, args []object.Object) *object.Enviro
 	env := object.NewEnclosedEnvironment(fn.Env)
 
 	for paramIdx, param := range fn.Parameters {
-		env.Set(param.Value, args[paramIdx])
+		env.Declare(param.Value, args[paramIdx])
 	}
 
 	return env
