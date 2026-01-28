@@ -214,8 +214,7 @@ func (ld *Loader) Load(path string) (*object.Environment, error) {
 	// Evaluate module in moduleEnv (NO deps param needed)
 	result := Eval(program, moduleEnv)
 	if result != nil && result.Type() == object.UNHANDLED_ERROR_OBJ {
-		fmt.Println(result.Inspect())
-		return nil, errors.New(result.Inspect())
+		return nil, buildRuntimeError(result.(*object.UnhandledError), path)
 	}
 
 	ld.envCache[path] = moduleEnv
@@ -266,6 +265,16 @@ func buildParserError(parseError *parser.ParseError, file string) error {
 		buf.WriteString("\n")
 	}
 
+	return errors.New(buf.String())
+}
+
+func buildRuntimeError(runtimeError *object.UnhandledError, path string) error {
+	var buf bytes.Buffer
+	buf.WriteString("\tYikes!\n")
+	fmt.Fprintf(&buf, "\t%s\n", path)
+	span := runtimeError.Token.Span
+	fmt.Fprintf(&buf, "\tToken Location: line %d, column %d\n", span.Line, span.Column)
+	fmt.Fprintf(&buf, "\tRuntime Error:  %s", runtimeError.Message)
 	return errors.New(buf.String())
 }
 

@@ -835,13 +835,11 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 	return result
 }
 
-func newError(format string, a ...interface{}) *object.UnhandledError {
-	ferr := fmt.Sprintf(format, a...)
-	loc := fmt.Sprintf("line %d, column %d", currentToken.Span.Line, currentToken.Span.Column)
-
-	msg := "\tYikes!\n\tRuntime Error:  " + ferr + "\n\tError Location: " + loc
-
-	return &object.UnhandledError{Message: ferr, FormattedMessage: msg}
+func newError(format string, a ...any) *object.UnhandledError {
+	return &object.UnhandledError{
+		Message: fmt.Sprintf(format, a...),
+		Token:   currentToken,
+	}
 }
 
 func isError(obj object.Object) bool {

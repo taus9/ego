@@ -3,6 +3,7 @@ package object
 import (
 	"bytes"
 	"ego/internal/frontend/ast"
+	"ego/internal/frontend/token"
 	"fmt"
 	"hash/fnv"
 	"strconv"
@@ -77,11 +78,11 @@ func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
 func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
 
 type UnhandledError struct {
-	Message          string
-	FormattedMessage string
+	Message string
+	Token   token.Token
 }
 
-func (ue *UnhandledError) Inspect() string  { return ue.FormattedMessage }
+func (ue *UnhandledError) Inspect() string  { return ue.Message }
 func (ue *UnhandledError) Type() ObjectType { return UNHANDLED_ERROR_OBJ }
 
 type Error struct {
