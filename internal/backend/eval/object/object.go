@@ -26,6 +26,7 @@ const (
 	MAP_OBJ             = "map"
 	BREAK_OBJ           = "break"
 	AGAIN_OBJ           = "again"
+	MODULE_OBJ          = "module"
 )
 
 type Object interface {
@@ -289,3 +290,13 @@ type Again struct{}
 
 func (a *Again) Type() ObjectType { return AGAIN_OBJ }
 func (a *Again) Inspect() string  { return "again" }
+
+type Module struct {
+	Name string
+	Env  *Environment
+}
+
+func (m *Module) Type() ObjectType { return MODULE_OBJ }
+func (m *Module) Inspect() string {
+	return fmt.Sprintf("<module %s>", m.Name)
+}

@@ -24,6 +24,7 @@ const (
 	ELSE
 	WHEN
 	IS
+	USE
 )
 
 const (
@@ -76,16 +77,19 @@ type Parser struct {
 
 	currentExpression *ast.Expression
 
+	useStatementAllowed bool
+
 	prefixParseFns map[token.TokenType]prefixParseFn
 	infixParseFns  map[token.TokenType]infixParseFn
 }
 
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
-		l:          l,
-		parseError: nil,
-		blockStack: NewStack(),
-		stackTrace: NewStack(),
+		l:                   l,
+		parseError:          nil,
+		blockStack:          NewStack(),
+		stackTrace:          NewStack(),
+		useStatementAllowed: true,
 	}
 
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
@@ -203,7 +207,18 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
+
+	case token.USE:
+
+		if p.stackTrace.Peek() != PROGRAM || p.useStatementAllowed == false {
+			p.createErrorMessage("all USE statements must be declared top of file")
+			return nil
+		}
+
+		return p.parseUseStatement()
+
 	case token.IDENT, token.CONST:
+		p.useStatementAllowed = false
 		if p.peekTokenIs(token.DECLARE) {
 			return p.parseDeclareStatement()
 		}
@@ -216,12 +231,15 @@ func (p *Parser) parseStatement() ast.Statement {
 
 		return exp
 	case token.COLON:
+		p.useStatementAllowed = false
 		return p.parseFunctionStatement()
 
 	case token.RETURN:
+		p.useStatementAllowed = false
 		return p.parseReturnStatement()
 
 	case token.FOR:
+		p.useStatementAllowed = false
 		return p.parseForStatement()
 
 	case token.BREAK:
@@ -254,6 +272,7 @@ func (p *Parser) parseStatement() ast.Statement {
 		return nil
 
 	default:
+		p.useStatementAllowed = false
 		return p.parseExpressionStatement()
 	}
 }

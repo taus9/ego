@@ -47,6 +47,7 @@ func TestNextToken(t *testing.T) {
 	$ myVar
 	{}
 	when is
+	use 'math' as m
 	`
 
 	tests := []struct {
@@ -220,6 +221,11 @@ func TestNextToken(t *testing.T) {
 		{token.EOL, "\n"},
 		{token.WHEN, "when"},
 		{token.IS, "is"},
+		{token.EOL, "\n"},
+		{token.USE, "use"},
+		{token.STRING, "math"},
+		{token.AS, "as"},
+		{token.IDENT, "m"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}

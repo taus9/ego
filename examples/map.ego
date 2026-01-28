@@ -1,0 +1,20 @@
+# ego version 0.1.0
+# map literals are enclosed in curly braces {}
+# key-value pairs are separated by commas
+# keys and values are separated by colons :
+# no trailing commas are allowed
+
+a := {
+    'test': 123,
+    'demo': 456
+}
+
+a['test'] = 123
+a['demo'] = 456
+put(a['test'] + a['demo'])  # Expected output: 579
+
+
+# SOME FEATURES DO NOT WORK YET AND THIS IS A WORK IN PROGRESS
+for k, v in a
+    put(k + ': ' + str(v))
+;

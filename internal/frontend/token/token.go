@@ -76,6 +76,8 @@ const (
 	AGAIN  = "AGAIN" // - p
 	WHEN   = "WHEN"
 	IS     = "IS"
+	USE    = "USE"
+	AS     = "AS"
 
 	// used internally by the parsers
 	ASSIGN_INTERNAL  = "$ASSIGN"
@@ -98,6 +100,8 @@ var keywords = map[string]TokenType{
 	"again": AGAIN,
 	"when":  WHEN,
 	"is":    IS,
+	"use":   USE,
+	"as":    AS,
 }
 
 func LookupIdent(ident string) TokenType {

@@ -1,0 +1,24 @@
+# ego version 0.1.0
+# this example demonstrates a simple factory function
+
+
+# this example is broken, plan to fix later
+:createLogger
+    logCount = 10
+    
+    log = :> 
+        
+    ;
+
+    ret {'log': log, 'getCount': logCount}
+;
+
+logger = createLogger()
+
+logger['log']('This is the first log message.')
+logger['log']('This is the second log message.')
+logger['log']('This is the third log message.')
+
+count = logger['getCount']
+
+put('Total log messages: ' + str(count))

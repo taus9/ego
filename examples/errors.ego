@@ -1,0 +1,23 @@
+a := ['1', '2', '3']
+
+# inline error handling with else clause
+val := a[3] else
+    put('There was an error accessing the array...')
+    ret nil
+;
+
+
+# return built-in error value
+:get arr, index
+   ret arr[index] else $E
+;
+
+
+b := get(a, 3)
+
+# check if function returned an error object
+if error(b)
+    put(b['message'])
+else
+    put('Value: ' + b)
+;

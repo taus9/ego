@@ -1,20 +1,21 @@
 # ego version 0.1.0
 # this example demonstrates the classic FizzBuzz problem
+use 'math'
 
-:fizzbuzz n
+:fizzbuzz n e
     for i := 1 to n 
         printed := false
         if i % 15 == 0
             put('FizzBuzz')
-            printed := true
+            printed = true
         ;
         if i % 3 == 0 and !printed
             put('Fizz')
-            printed := true
+            printed = true
         ;
         if i % 5 == 0 and !printed
             put('Buzz')
-            printed := true
+            printed = true
         ;
         if !printed
             put(i)

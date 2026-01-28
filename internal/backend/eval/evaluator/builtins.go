@@ -4,6 +4,7 @@ import (
 	"ego/internal/backend/eval/object"
 	"fmt"
 	"maps"
+	"os"
 )
 
 var builtins = map[string]*object.Builtin{
@@ -150,6 +151,27 @@ var builtins = map[string]*object.Builtin{
 			pairs[hashed] = object.MapPair{Key: columnKey, Value: columnValue}
 
 			return &object.Error{Pairs: pairs}
+		},
+	},
+
+	"exit": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) > 1 {
+				return newError("wrong number of arguments. got=%d, want=0 or 1", len(args))
+			}
+
+			exitCode := 0
+
+			if len(args) == 1 {
+				if args[0].Type() != object.INTEGER_OBJ {
+					return newError("argument to 'exit' must be INTEGER, got %s", args[0].Type())
+				}
+				intObj := args[0].(*object.Integer)
+				exitCode = int(intObj.Value)
+			}
+
+			os.Exit(exitCode)
+			return NIL
 		},
 	},
 
