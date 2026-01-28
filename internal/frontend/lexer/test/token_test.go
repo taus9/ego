@@ -48,6 +48,7 @@ func TestNextToken(t *testing.T) {
 	{}
 	when is
 	use 'math' as m
+	math.$PI
 	`
 
 	tests := []struct {
@@ -226,6 +227,10 @@ func TestNextToken(t *testing.T) {
 		{token.STRING, "math"},
 		{token.AS, "as"},
 		{token.IDENT, "m"},
+		{token.EOL, "\n"},
+		{token.IDENT, "math"},
+		{token.DOT, "."},
+		{token.CONST, "$PI"},
 		{token.EOL, "\n"},
 		{token.EOF, ""},
 	}
