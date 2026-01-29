@@ -1,0 +1,119 @@
+:toUpper string
+    new := ''
+    # loop through every character in string
+    for _, c in string
+        u := when c
+            is 'a': 'A'
+            is 'b': 'B'
+            is 'c': 'C'
+            is 'd': 'D'
+            is 'e': 'E'
+            is 'f': 'F'
+            is 'g': 'G'
+            is 'h': 'H'
+            is 'i': 'I'
+            is 'j': 'J'
+            is 'k': 'K'
+            is 'l': 'L'
+            is 'm': 'M'
+            is 'n': 'N'
+            is 'o': 'O'
+            is 'p': 'P'
+            is 'q': 'Q'
+            is 'r': 'R'
+            is 's': 'S'
+            is 't': 'T'
+            is 'u': 'U'
+            is 'v': 'V'
+            is 'w': 'W'
+            is 'x': 'X'
+            is 'y': 'Y'
+            is 'z': 'Z'
+            else: c     # if the character isn't a letter return it as-is
+        ;
+        new = new + u
+    ;
+    ret new
+;
+
+:toLower string
+    new := ''
+    # loop through every character in string
+    for _, c in string
+        l := when c
+            is 'A': 'a'
+            is 'B': 'b'
+            is 'C': 'c'
+            is 'D': 'd'
+            is 'E': 'e'
+            is 'F': 'f'
+            is 'G': 'g'
+            is 'H': 'h'
+            is 'I': 'i'
+            is 'J': 'j'
+            is 'K': 'k'
+            is 'L': 'l'
+            is 'M': 'm'
+            is 'N': 'n'
+            is 'O': 'o'
+            is 'P': 'p'
+            is 'Q': 'q'
+            is 'R': 'r'
+            is 'S': 's'
+            is 'T': 't'
+            is 'U': 'u'
+            is 'V': 'v'
+            is 'W': 'w'
+            is 'X': 'x'
+            is 'Y': 'y'
+            is 'Z': 'z'
+            else: c     # if the character isn't a letter return it as-is
+        ;
+        new = new + l
+    ;
+    ret new
+;
+
+# :contains s, substr
+#     ret when s.indexOf( substr ) >= 0
+#         is true: true
+#         else: false
+# ;
+
+:indexOf s, substr
+    if s == ''
+        ret 0
+    ;
+
+    strLen := len(s)
+    subLen := len(substr)
+
+    if subLen > strLen
+        ret -1
+    ;
+
+    i := 0
+    limit := strLen - subLen
+    
+    for i <= limit
+
+        j := 0
+        matched := true
+
+        for j < subLen
+            if s[i + j] != substr[j]
+                matched = false
+                break
+            ;
+            j = j + 1
+        ;
+
+        if matched
+            ret i
+        ;
+        
+        i  = i + 1
+    ;
+
+    ret -1
+;
