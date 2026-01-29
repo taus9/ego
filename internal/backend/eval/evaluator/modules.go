@@ -155,6 +155,8 @@ func (ld *Loader) Load(path string) (*object.Environment, error) {
 		p := parser.New(l)
 		program = p.ParseProgram()
 
+		program = unwrapProtoMain(program)
+
 		if p.ParseError() != nil {
 			return nil, buildParserError(p.ParseError(), path)
 		}
@@ -223,11 +225,8 @@ func (ld *Loader) Load(path string) (*object.Environment, error) {
 }
 
 func (ld *Loader) getUseStatements(program *ast.Program) []*ast.UseStatement {
-	// Program will always be wrapped in a proto main function
-	protoMain, _ := program.Statements[0].(*ast.FunctionStatement)
-	uses := []*ast.UseStatement{}
-
-	for _, stmt := range protoMain.Body.Statements {
+	var uses []*ast.UseStatement
+	for _, stmt := range program.Statements {
 		if useStmt, ok := stmt.(*ast.UseStatement); ok {
 			uses = append(uses, useStmt)
 		} else {
@@ -237,6 +236,19 @@ func (ld *Loader) getUseStatements(program *ast.Program) []*ast.UseStatement {
 	}
 
 	return uses
+}
+
+func unwrapProtoMain(program *ast.Program) *ast.Program {
+	protoMain, ok := program.Statements[0].(*ast.FunctionStatement)
+	if !ok {
+		return program
+	}
+
+	newProgram := &ast.Program{
+		Statements: protoMain.Body.Statements,
+	}
+
+	return newProgram
 }
 
 func buildParserError(parseError *parser.ParseError, file string) error {

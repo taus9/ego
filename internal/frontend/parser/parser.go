@@ -39,6 +39,7 @@ const (
 	PREFIX
 	CALL
 	INDEX
+	MEMBER
 )
 
 var precedences = map[token.TokenType]int{
@@ -57,6 +58,7 @@ var precedences = map[token.TokenType]int{
 	token.MOD:      PRODUCT,
 	token.LPAREN:   CALL,
 	token.LBRACKET: INDEX,
+	token.DOT:      MEMBER,
 }
 
 type (
@@ -157,6 +159,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.AND, p.parseInfixExpression)
 	p.registerInfix(token.LT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.GT_EQ, p.parseInfixExpression)
+	p.registerInfix(token.DOT, p.parseMemberExpression)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()

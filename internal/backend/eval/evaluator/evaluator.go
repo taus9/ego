@@ -455,6 +455,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		currentToken = node.Token
 		return nativeBoolToBooleanObject(node.Value)
 
+	case *ast.MemberExpression:
+		currentToken = node.Token
+		return evalMemberExpression(*node.ModuleName, node.ModuleProperty, env)
+
 	}
 
 	return nil
@@ -847,6 +851,45 @@ func isError(obj object.Object) bool {
 		return obj.Type() == object.UNHANDLED_ERROR_OBJ
 	}
 	return false
+}
+
+func evalMemberExpression(name ast.Identifier, property ast.Expression, env *object.Environment) object.Object {
+	_, isIdent := property.(*ast.Identifier)
+	_, isCall := property.(*ast.CallExpression)
+	if !isIdent && !isCall {
+		return newError("invalid member expression")
+	}
+
+	moduleObj := evalIdentifier(&name, env)
+	if isError(moduleObj) {
+		return moduleObj
+	}
+
+	switch module := moduleObj.(type) {
+	case *object.Module:
+		if isIdent {
+			propIdent := property.(*ast.Identifier)
+			if val, ok := module.Env.Get(propIdent.Value); ok {
+				return val
+			} else {
+				return newError("module '%s' has no exported member '%s'", name.Value, propIdent.Value)
+			}
+		} else if isCall {
+			callExp := property.(*ast.CallExpression)
+			funcObj, ok := module.Env.Get(callExp.Function.(*ast.Identifier).Value)
+			if !ok {
+				return newError("module '%s' has no exported function '%s'", name.Value, callExp.Function.(*ast.Identifier).Value)
+			}
+			args := evalExpressions(callExp.Arguments, env)
+			if len(args) == 1 && isError(args[0]) {
+				return args[0]
+			}
+			return applyFunction(funcObj, args)
+		}
+	default:
+		return newError("identifier not found: %s", name.Value)
+	}
+	return NIL
 }
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
