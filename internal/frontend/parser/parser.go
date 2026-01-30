@@ -202,7 +202,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 		p.nextToken()
 	}
 
-	program.Statements = p.createProtoMainSetup(program.Statements)
+	//program.Statements = p.createProtoMainSetup(program.Statements)
 
 	p.stackTrace.Pop()
 	return program
