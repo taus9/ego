@@ -1,10 +1,8 @@
-:toUpper string
-    if type(string) != 'string'
-        err('toUpper() expected a string argument, got ' + type(string))
-    ;
+:toUpper s
+    expect(s, 'string', 'toUpper', 1)
     new := ''
-    # loop through every character in string
-    for _, c in string
+    # loop through every character in s
+    for _, c in s
         u := when c
             is 'a': 'A'
             is 'b': 'B'
@@ -39,13 +37,11 @@
     ret new
 ;
 
-:toLower string
-    if type(string) != 'string'
-        err('toLower() expected a string argument, got ' + type(string))
-    ;
+:toLower s
+    expect(s, 'string', 'toLower', 1)
     new := ''
-    # loop through every character in string
-    for _, c in string
+    # loop through every character in s
+    for _, c in s
         l := when c
             is 'A': 'a'
             is 'B': 'b'
@@ -81,17 +77,18 @@
 ;
 
 :indexOf s, substr
-    if type(s) != 'string'
-        err('indexOf() expected first argument to be a string, got ' + type(s))
-    ;
-    if type(substr) != 'string'
-        err('indexOf() expected second argument to be a string, got ' + type(substr))
-    ;
+    expect(s, 'string', 'indexOf', 1)
+    expect(substr, 'string', 'indexOf', 2)
     if substr == ''
         ret 0
     ;
-    for i := 0 to len(s) - len(substr)
-        strSlice := slice(s, i, i + len(substr))
+    strLen := len(s)
+    substrLen := len(substr)
+    if substrLen > strLen
+        ret -1
+    ;
+    for i := 0 to strLen - substrLen
+        strSlice := slice(s, i, i + substrLen)
         if strSlice == substr
             ret i
         ;
@@ -99,23 +96,18 @@
     ret -1
 ;
 
-:slice string, start, end
-    if type(string) != 'string'
-        err('slice() expected first argument to be a string, got ' + type(string))
-    ;
-    if type(start) != 'integer'
-        err('slice() expected second argument to be an integer, got ' + type(start))
-    ;
-    if type(end) != 'integer'
-        err('slice() expected third argument to be an integer, got ' + type(end))
-    ;
-    if start < 0 or end < 0 or start > len(string) or end > len(string) or start > end
-        err('slice() indices out of range: ' + start + ', ' + end + ' for string of length ' + len(string))
+:slice s, start, end
+    expect(s, 'string', 'slice', 1)
+    expect(start, 'integer', 'slice', 2)
+    expect(end, 'integer', 'slice', 3)
+    sLen := len(s)
+    if start < 0 or end < 0 or start > sLen or end > sLen or start > end
+        ret error('slice() indices out of range: ' + str(start) + ', ' + str(end) + ' for string of length ' + str(sLen))
     ;
     new := ''
-    for i := 0 to len(string) - 1
+    for i := 0 to sLen - 1
         if i >= start and i < end
-            new = new + string[i]
+            new = new + s[i]
         ;
     ;
     ret new
