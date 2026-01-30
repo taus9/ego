@@ -182,6 +182,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			if isError(evalResult) {
 				return evalResult
 			}
+			if _, ok := evalResult.(*object.ReturnValue); ok {
+				return evalResult
+			}
 			if _, ok := evalResult.(*object.Break); ok {
 				break
 			}
@@ -225,6 +228,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					return evalResult
 				}
 
+				if _, ok := evalResult.(*object.ReturnValue); ok {
+					return evalResult
+				}
+
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -237,6 +244,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				env.Set(node.Iterator.Value, &object.Integer{Value: i})
 				evalResult := evalBlockStatement(node.Body, env)
 				if isError(evalResult) {
+					return evalResult
+				}
+
+				if _, ok := evalResult.(*object.ReturnValue); ok {
 					return evalResult
 				}
 
@@ -280,6 +291,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					return evalResult
 				}
 
+				if _, ok := evalResult.(*object.ReturnValue); ok {
+					return evalResult
+				}
+
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -302,6 +317,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 					return evalResult
 				}
 
+				if _, ok := evalResult.(*object.ReturnValue); ok {
+					return evalResult
+				}
+
 				if _, ok := evalResult.(*object.Break); ok {
 					break
 				}
@@ -321,6 +340,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 				evalResult := evalBlockStatement(node.Body, env)
 
 				if isError(evalResult) {
+					return evalResult
+				}
+
+				if _, ok := evalResult.(*object.ReturnValue); ok {
 					return evalResult
 				}
 
