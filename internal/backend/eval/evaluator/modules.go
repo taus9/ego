@@ -155,7 +155,7 @@ func (ld *Loader) Load(path string) (*object.Environment, error) {
 		p := parser.New(l)
 		program = p.ParseProgram()
 
-		program = unwrapProtoMain(program)
+		//program = unwrapProtoMain(program)
 
 		if p.ParseError() != nil {
 			return nil, buildParserError(p.ParseError(), path)
