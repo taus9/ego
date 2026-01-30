@@ -175,6 +175,42 @@ var builtins = map[string]*object.Builtin{
 		},
 	},
 
+	"expect": {
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 4 {
+				return newError("wrong number of arguments. got=%d, want=2", len(args))
+			}
+
+			// type expected
+			expectedObj, ok := args[1].(*object.String)
+			if !ok {
+				return newError("second argument to 'expect' must be STRING, got %s", args[1].Type())
+			}
+
+			// function name
+			funcNameObj, ok := args[2].(*object.String)
+			if !ok {
+				return newError("third argument to 'expect' must be STRING, got %s", args[2].Type())
+			}
+
+			// argument position
+			argPosObj, ok := args[3].(*object.Integer)
+			if !ok {
+				return newError("fourth argument to 'expect' must be INTEGER, got %s", args[3].Type())
+			}
+
+			expectedType := expectedObj.Value
+			actualType := string(args[0].Type())
+
+			if expectedType != actualType {
+				return newError("%s() expected argument %d to be %s, got %s", funcNameObj.Value, argPosObj.Value, expectedType, actualType)
+			}
+
+			return NIL
+
+		},
+	},
+
 	"float": {
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
