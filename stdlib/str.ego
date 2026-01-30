@@ -1,4 +1,7 @@
 :toUpper string
+    if type(string) != 'string'
+        err('toUpper() expected a string argument, got ' + type(string))
+    ;
     new := ''
     # loop through every character in string
     for _, c in string
@@ -37,6 +40,9 @@
 ;
 
 :toLower string
+    if type(string) != 'string'
+        err('toLower() expected a string argument, got ' + type(string))
+    ;
     new := ''
     # loop through every character in string
     for _, c in string
@@ -75,6 +81,12 @@
 ;
 
 :indexOf s, substr
+    if type(s) != 'string'
+        err('indexOf() expected first argument to be a string, got ' + type(s))
+    ;
+    if type(substr) != 'string'
+        err('indexOf() expected second argument to be a string, got ' + type(substr))
+    ;
     if substr == ''
         ret 0
     ;
@@ -88,6 +100,18 @@
 ;
 
 :slice string, start, end
+    if type(string) != 'string'
+        err('slice() expected first argument to be a string, got ' + type(string))
+    ;
+    if type(start) != 'integer'
+        err('slice() expected second argument to be an integer, got ' + type(start))
+    ;
+    if type(end) != 'integer'
+        err('slice() expected third argument to be an integer, got ' + type(end))
+    ;
+    if start < 0 or end < 0 or start > len(string) or end > len(string) or start > end
+        err('slice() indices out of range: ' + start + ', ' + end + ' for string of length ' + len(string))
+    ;
     new := ''
     for i := 0 to len(string) - 1
         if i >= start and i < end
