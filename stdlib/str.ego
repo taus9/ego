@@ -74,27 +74,16 @@
     ret new
 ;
 
-# :contains s, substr
-#     ret when s.indexOf( substr ) >= 0
-#         is true: true
-#         else: false
-# ;
-
 :indexOf s, substr
     if substr == ''
         ret 0
     ;
-
     for i := 0 to len(s) - len(substr)
-        put('Checking at index ' + str(i))
         strSlice := slice(s, i, i + len(substr))
-        put('Comparing "' + strSlice + '" to "' + substr + '"')
         if strSlice == substr
-            put('Found substring at index ' + str(i))
             ret i
         ;
     ;
-    put('This should not be reached if substring is found')
     ret -1
 ;
 
