@@ -81,39 +81,29 @@
 # ;
 
 :indexOf s, substr
-    if s == ''
+    if substr == ''
         ret 0
     ;
 
-    strLen := len(s)
-    subLen := len(substr)
-
-    if subLen > strLen
-        ret -1
-    ;
-
-    i := 0
-    limit := strLen - subLen
-    
-    for i <= limit
-
-        j := 0
-        matched := true
-
-        for j < subLen
-            if s[i + j] != substr[j]
-                matched = false
-                break
-            ;
-            j = j + 1
-        ;
-
-        if matched
+    for i := 0 to len(s) - len(substr)
+        put('Checking at index ' + str(i))
+        strSlice := slice(s, i, i + len(substr))
+        put('Comparing "' + strSlice + '" to "' + substr + '"')
+        if strSlice == substr
+            put('Found substring at index ' + str(i))
             ret i
         ;
-        
-        i  = i + 1
     ;
-
+    put('This should not be reached if substring is found')
     ret -1
+;
+
+:slice string, start, end
+    new := ''
+    for i := 0 to len(string) - 1
+        if i >= start and i < end
+            new = new + string[i]
+        ;
+    ;
+    ret new
 ;
