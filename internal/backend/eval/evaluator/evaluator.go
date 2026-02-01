@@ -1122,6 +1122,8 @@ func evalIndexExpression(left, index object.Object) object.Object {
 		return evalMapIndexExpression(left, index)
 	case left.Type() == object.ERROR_OBJ:
 		return evalErrorIndexExpression(left, index)
+	case left.Type() == object.EXEC_OBJ:
+		return evalMapIndexExpression(left, index)
 	default:
 		return newError("index operator not supported: %s", left.Type())
 	}
