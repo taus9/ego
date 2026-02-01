@@ -77,8 +77,6 @@ type Parser struct {
 	blockStack *Stack
 	stackTrace *Stack
 
-	currentExpression *ast.Expression
-
 	useStatementAllowed bool
 
 	prefixParseFns map[token.TokenType]prefixParseFn
