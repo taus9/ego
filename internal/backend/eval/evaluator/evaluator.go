@@ -1116,10 +1116,23 @@ func evalMapIndexExpression(mapObj, index object.Object) object.Object {
 func createErrorObject(unhandledError *object.UnhandledError) *object.Error {
 	pairs := make(map[object.HashKey]object.MapPair)
 
+	var errorType string
+	if unhandledError.ErrorType != "" {
+		errorType = unhandledError.ErrorType
+	} else {
+		errorType = "runtime"
+	}
+
+	typeKey := &object.String{Value: "type"}
+	typeValue := &object.String{Value: errorType}
+
+	hashed := typeKey.HasKey()
+	pairs[hashed] = object.MapPair{Key: typeKey, Value: typeValue}
+
 	messageKey := &object.String{Value: "message"}
 	messageValue := &object.String{Value: unhandledError.Message}
 
-	hashed := messageKey.HasKey()
+	hashed = messageKey.HasKey()
 	pairs[hashed] = object.MapPair{Key: messageKey, Value: messageValue}
 
 	lineKey := &object.String{Value: "line"}

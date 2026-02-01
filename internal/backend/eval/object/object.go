@@ -78,8 +78,9 @@ func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
 func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
 
 type UnhandledError struct {
-	Message string
-	Token   token.Token
+	Message   string
+	Token     token.Token
+	ErrorType string
 }
 
 func (ue *UnhandledError) Inspect() string  { return ue.Message }
