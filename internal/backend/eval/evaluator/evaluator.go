@@ -1123,10 +1123,27 @@ func evalIndexExpression(left, index object.Object) object.Object {
 	case left.Type() == object.ERROR_OBJ:
 		return evalErrorIndexExpression(left, index)
 	case left.Type() == object.EXEC_OBJ:
-		return evalMapIndexExpression(left, index)
+		return evalExecIndexExpression(left, index)
 	default:
 		return newError("index operator not supported: %s", left.Type())
 	}
+}
+
+func evalExecIndexExpression(execObj, index object.Object) object.Object {
+	execObject := execObj.(*object.Exec)
+
+	key, ok := index.(*object.String)
+	if !ok {
+		return newError("exec index must be a string")
+	}
+
+	hashed := key.HasKey()
+	pair, ok := execObject.Pairs[hashed]
+	if !ok {
+		return NIL
+	}
+
+	return pair.Value
 }
 
 func evalErrorIndexExpression(errObj, index object.Object) object.Object {
