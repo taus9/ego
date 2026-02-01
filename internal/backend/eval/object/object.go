@@ -28,6 +28,7 @@ const (
 	BREAK_OBJ           = "break"
 	AGAIN_OBJ           = "again"
 	MODULE_OBJ          = "module"
+	EXEC_OBJ            = "exec"
 )
 
 type Object interface {
@@ -302,3 +303,11 @@ func (m *Module) Type() ObjectType { return MODULE_OBJ }
 func (m *Module) Inspect() string {
 	return fmt.Sprintf("<module %s>", m.Name)
 }
+
+type Exec struct {
+	Command string
+	Output  string
+}
+
+func (e *Exec) Type() ObjectType { return EXEC_OBJ }
+func (e *Exec) Inspect() string  { return fmt.Sprintf("exec `%s`", e.Command) }

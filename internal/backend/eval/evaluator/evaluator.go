@@ -5,8 +5,10 @@ import (
 	"ego/internal/frontend/ast"
 	"ego/internal/frontend/token"
 	"fmt"
+	"os/exec"
 	"slices"
 	"strconv"
+	"strings"
 )
 
 var reservedWords = []string{
@@ -491,6 +493,9 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		currentToken = node.Token
 		return evalMemberExpression(*node.ModuleName, node.ModuleProperty, env)
 
+	case *ast.ExecLiteral:
+		currentToken = node.Token
+		return evalExecLiteralExpression(node, env)
 	}
 
 	return nil
@@ -888,6 +893,14 @@ func newError(format string, a ...any) *object.UnhandledError {
 	}
 }
 
+func newExecError(format string, a ...any) *object.UnhandledError {
+	return &object.UnhandledError{
+		Message:   fmt.Sprintf(format, a...),
+		Token:     currentToken,
+		ErrorType: "exec",
+	}
+}
+
 func isError(obj object.Object) bool {
 	if obj != nil {
 		return obj.Type() == object.UNHANDLED_ERROR_OBJ
@@ -988,6 +1001,53 @@ func unwrapReturnValue(obj object.Object) object.Object {
 		return returnValue.Value
 	}
 	return obj
+}
+
+func resolveCommandString(commandStr string, env *object.Environment) (string, error) {
+	var resultStr strings.Builder
+	i := 0
+	for i < len(commandStr) {
+		if commandStr[i] == '{' {
+			j := i + 1
+			for j < len(commandStr) && commandStr[j] != '}' {
+				j++
+			}
+			if j == len(commandStr) {
+				return "", fmt.Errorf("unterminated identifier in exec command")
+			}
+			identName := commandStr[i+1 : j]
+			identObj := evalIdentifier(&ast.Identifier{Value: identName}, env)
+			if isError(identObj) {
+				return "", fmt.Errorf("identifier not found: %s", identName)
+			}
+			fmt.Fprintf(&resultStr, "%v", identObj.Inspect())
+			i = j + 1
+		} else {
+			resultStr.WriteString(string(commandStr[i]))
+			i++
+		}
+	}
+
+	return resultStr.String(), nil
+}
+
+func evalExecLiteralExpression(node *ast.ExecLiteral, env *object.Environment) object.Object {
+	commandStr, err := resolveCommandString(node.Command, env)
+	if err != nil {
+		return newError("%s", err.Error())
+	}
+
+	commands := strings.Fields(commandStr)
+	if len(commands) == 0 {
+		return newError("empty command in exec literal")
+	}
+
+	output, err := exec.Command(commands[0], commands[1:]...).CombinedOutput()
+	if err != nil {
+		return newExecError("%s", err.Error())
+	}
+
+	return &object.Exec{Command: commandStr, Output: string(output)}
 }
 
 func evalStringInfixExpression(operator string, left, right object.Object) object.Object {
