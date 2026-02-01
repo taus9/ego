@@ -47,7 +47,7 @@ const (
 	LT_EQ  = "<=" // - p
 	GT_EQ  = ">=" // - p
 
-	DOT          = "."
+	DOT          = "." // - p
 	COMMA        = "," // - p
 	SINGLE_QUOTE = "'" // - p
 	LBRACKET     = "[" // - p
@@ -61,7 +61,7 @@ const (
 	COLON         = ":"  // - p
 	ANON_FUNCTION = ":>" // - p
 	END_BLOCK     = ";"  // - p
-	DECLARE       = ":="
+	DECLARE       = ":=" // -p
 
 	TRUE   = "TRUE"  // - p
 	FALSE  = "FALSE" // - p
@@ -75,10 +75,10 @@ const (
 	OR     = "OR"    // - p
 	BREAK  = "BREAK" // - p
 	AGAIN  = "AGAIN" // - p
-	WHEN   = "WHEN"
-	IS     = "IS"
-	USE    = "USE"
-	AS     = "AS"
+	WHEN   = "WHEN"  // - p
+	IS     = "IS"    // - p
+	USE    = "USE"   // - p
+	AS     = "AS"    // - p
 
 	// used internally by the parsers
 	ASSIGN_INTERNAL  = "$ASSIGN"

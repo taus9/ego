@@ -136,6 +136,9 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.AND, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.OR, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.IS, p.parseUnexpectedTokenError)
+	p.registerPrefix(token.USE, p.parseUnexpectedTokenError)
+	p.registerPrefix(token.AS, p.parseUnexpectedTokenError)
+	p.registerPrefix(token.DOT, p.parseUnexpectedTokenError)
 	p.registerPrefix(token.ILLEGAL, p.parseIllegalTokenError)
 
 	p.registerPrefix(token.END_BLOCK, p.unexpectedEndBlockStatement)
