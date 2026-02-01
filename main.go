@@ -33,8 +33,7 @@ func main() {
 func runFile(entryPath string, args []string) {
 	globalEnv := object.NewEnvironment()
 	evaluator.InitReservedValues(globalEnv)
-
-	initUserArgs(globalEnv, args)
+	evaluator.InitUserArgs(globalEnv, args)
 
 	res := evaluator.Resolver{
 		StdlibRoot: "stdlib",
@@ -49,16 +48,6 @@ func runFile(entryPath string, args []string) {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-}
-
-func initUserArgs(env *object.Environment, args []string) {
-	for i, arg := range args {
-		argName := fmt.Sprintf("$%d", i+1)
-		argObj := &object.String{Value: arg}
-		env.Declare(argName, argObj)
-	}
-	argc := len(args)
-	env.Declare("$a", &object.Integer{Value: int64(argc)})
 }
 
 func showUsage() {

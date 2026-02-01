@@ -500,6 +500,16 @@ func InitReservedValues(env *object.Environment) {
 	env.Declare("nil", &object.Nil{})
 }
 
+func InitUserArgs(env *object.Environment, args []string) {
+	for i, arg := range args {
+		argName := fmt.Sprintf("$%d", i+1)
+		argObj := &object.String{Value: arg}
+		env.Declare(argName, argObj)
+	}
+	argc := len(args)
+	env.Declare("$a", &object.Integer{Value: int64(argc)})
+}
+
 func isReservedWord(word string) bool {
 	_, ok := builtins[word]
 	return slices.Contains(reservedWords, word) || ok
