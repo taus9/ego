@@ -90,7 +90,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok = l.newToken(token.COLON, l.ch)
 		}
 	case '\'':
-		str, err := l.readString()
+		str, err := l.readString('\'')
 		if err != nil {
 			tok.Type = token.UNTERMINATED_STRING
 		} else {
@@ -98,6 +98,16 @@ func (l *Lexer) NextToken() token.Token {
 		}
 		tok.Literal = str
 		// column -1 because when we call readString we advance past the opening quote
+		tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal) - 1}
+	case '`':
+		str, err := l.readString('`')
+		if err != nil {
+			tok.Type = token.UNTERMINATED_STRING
+		} else {
+			tok.Type = token.EXEC
+		}
+		tok.Literal = str
+		// column -1 because when we call readString we advance past the opening backtick
 		tok.Span = token.Span{Line: l.line, Column: l.column - len(tok.Literal) - 1}
 	case '.':
 		tok = l.newToken(token.DOT, l.ch)
@@ -244,12 +254,12 @@ func (l *Lexer) skipWhitespace() {
 	}
 }
 
-func (l *Lexer) readString() (string, error) {
+func (l *Lexer) readString(closingChar byte) (string, error) {
 	position := l.position + 1
 	err := error(nil)
 	for {
 		l.readChar()
-		if l.ch == '\'' {
+		if l.ch == closingChar {
 			break
 		}
 		if l.ch == '\n' || l.ch == 0 {

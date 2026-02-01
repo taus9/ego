@@ -47,6 +47,7 @@ const (
 	LT_EQ  = "<=" // - p
 	GT_EQ  = ">=" // - p
 
+	EXEC         = "`"
 	DOT          = "." // - p
 	COMMA        = "," // - p
 	SINGLE_QUOTE = "'" // - p
