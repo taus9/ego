@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"maps"
 	"os"
+	"strings"
 )
 
 var builtins = map[string]*object.Builtin{
@@ -125,32 +126,54 @@ var builtins = map[string]*object.Builtin{
 				return newError("wrong number of arguments. got=%d, want=1", len(args))
 			}
 
-			if args[0].Type() != object.STRING_OBJ {
-				return newError("argument to must be STRING, got %s", args[0].Type())
+			switch args[0].Type() {
+			case object.STRING_OBJ:
+				strObj := args[0].(*object.String)
+				pairs := make(map[object.HashKey]object.MapPair)
+
+				typeKey := &object.String{Value: "type"}
+				typeValue := &object.String{Value: "error"}
+
+				hashed := typeKey.HasKey()
+				pairs[hashed] = object.MapPair{Key: typeKey, Value: typeValue}
+
+				messageKey := &object.String{Value: "message"}
+				messageValue := &object.String{Value: strObj.Value}
+
+				hashed = messageKey.HasKey()
+				pairs[hashed] = object.MapPair{Key: messageKey, Value: messageValue}
+
+				return &object.Error{Pairs: pairs}
+
+			case object.MAP_OBJ:
+				mapObj := args[0].(*object.Map)
+				for _, pair := range mapObj.Pairs {
+					if pair.Key.Type() != object.STRING_OBJ {
+						return newError("error map keys must be STRING, got %s", pair.Key.Type())
+					}
+				}
+
+				// map must contain at least "message" key
+				_, hasMessage := mapObj.Pairs[(&object.String{Value: "message"}).HasKey()]
+				if !hasMessage {
+					return newError("error map must contain 'message' key")
+				}
+
+				// if no type key or if type key is an empty string, set it to "error"
+				typeValue, hasType := mapObj.Pairs[(&object.String{Value: "type"}).HasKey()]
+				if !hasType || strings.Trim(typeValue.Value.Inspect(), " ") == "" {
+					typeKey := &object.String{Value: "type"}
+					typeValue := &object.String{Value: "error"}
+
+					hashed := typeKey.HasKey()
+					mapObj.Pairs[hashed] = object.MapPair{Key: typeKey, Value: typeValue}
+				}
+
+				return &object.Error{Pairs: mapObj.Pairs}
+
+			default:
+				return newError("argument to 'error' must be STRING or MAP, got %s", args[0].Type())
 			}
-
-			strObj := args[0].(*object.String)
-			pairs := make(map[object.HashKey]object.MapPair)
-
-			messageKey := &object.String{Value: "message"}
-			messageValue := &object.String{Value: strObj.Value}
-
-			hashed := messageKey.HasKey()
-			pairs[hashed] = object.MapPair{Key: messageKey, Value: messageValue}
-
-			lineKey := &object.String{Value: "line"}
-			lineValue := NIL
-
-			hashed = lineKey.HasKey()
-			pairs[hashed] = object.MapPair{Key: lineKey, Value: lineValue}
-
-			columnKey := &object.String{Value: "column"}
-			columnValue := NIL
-
-			hashed = columnKey.HasKey()
-			pairs[hashed] = object.MapPair{Key: columnKey, Value: columnValue}
-
-			return &object.Error{Pairs: pairs}
 		},
 	},
 
