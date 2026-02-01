@@ -79,9 +79,10 @@ func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
 func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
 
 type UnhandledError struct {
-	Message   string
-	Token     token.Token
-	ErrorType string
+	Message    string
+	Token      token.Token
+	ErrorType  string
+	StatusCode int
 }
 
 func (ue *UnhandledError) Inspect() string  { return ue.Message }
@@ -305,9 +306,21 @@ func (m *Module) Inspect() string {
 }
 
 type Exec struct {
-	Command string
-	Output  string
+	Pairs map[HashKey]MapPair
 }
 
 func (e *Exec) Type() ObjectType { return EXEC_OBJ }
-func (e *Exec) Inspect() string  { return fmt.Sprintf("exec `%s`", e.Command) }
+func (e *Exec) Inspect() string {
+	var out bytes.Buffer
+
+	pairs := []string{}
+	for _, pair := range e.Pairs {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", pair.Key.Inspect(), pair.Value.Inspect()))
+	}
+
+	out.WriteString("{")
+	out.WriteString(strings.Join(pairs, ", "))
+	out.WriteString("}")
+
+	return out.String()
+}

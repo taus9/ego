@@ -893,11 +893,12 @@ func newError(format string, a ...any) *object.UnhandledError {
 	}
 }
 
-func newExecError(format string, a ...any) *object.UnhandledError {
+func newExecError(message string, statusCode int) *object.UnhandledError {
 	return &object.UnhandledError{
-		Message:   fmt.Sprintf(format, a...),
-		Token:     currentToken,
-		ErrorType: "exec",
+		Message:    message,
+		Token:      currentToken,
+		ErrorType:  "exec",
+		StatusCode: statusCode,
 	}
 }
 
@@ -1037,17 +1038,54 @@ func evalExecLiteralExpression(node *ast.ExecLiteral, env *object.Environment) o
 		return newError("%s", err.Error())
 	}
 
-	commands := strings.Fields(commandStr)
-	if len(commands) == 0 {
+	command, args := parseArguments(commandStr)
+	if command == "" {
 		return newError("empty command in exec literal")
 	}
 
-	output, err := exec.Command(commands[0], commands[1:]...).CombinedOutput()
+	cmd := exec.Command(command, args...)
+	output, err := cmd.CombinedOutput()
+
 	if err != nil {
-		return newExecError("%s", err.Error())
+		exitErr := err.(*exec.ExitError)
+		return newExecError(string(output), exitErr.ExitCode())
 	}
 
-	return &object.Exec{Command: commandStr, Output: string(output)}
+	return createExecObject(commandStr, string(output))
+}
+
+func parseArguments(commandStr string) (string, []string) {
+
+	ap := NewArgumentParser(commandStr)
+	command := ap.NextArgument()
+
+	var args []string
+
+	arg := ap.NextArgument()
+	for arg != "" {
+		args = append(args, arg)
+		arg = ap.NextArgument()
+	}
+
+	return command, args
+}
+
+func createExecObject(command string, output string) *object.Exec {
+	pairs := make(map[object.HashKey]object.MapPair)
+
+	commandKey := &object.String{Value: "command"}
+	commandValue := &object.String{Value: command}
+
+	hashed := commandKey.HasKey()
+	pairs[hashed] = object.MapPair{Key: commandKey, Value: commandValue}
+
+	outputKey := &object.String{Value: "output"}
+	outputValue := &object.String{Value: output}
+
+	hashed = outputKey.HasKey()
+	pairs[hashed] = object.MapPair{Key: outputKey, Value: outputValue}
+
+	return &object.Exec{Pairs: pairs}
 }
 
 func evalStringInfixExpression(operator string, left, right object.Object) object.Object {
@@ -1206,6 +1244,14 @@ func createErrorObject(unhandledError *object.UnhandledError) *object.Error {
 
 	hashed = columnKey.HasKey()
 	pairs[hashed] = object.MapPair{Key: columnKey, Value: columnValue}
+
+	if unhandledError.StatusCode != 0 {
+		statusKey := &object.String{Value: "code"}
+		statusValue := &object.Integer{Value: int64(unhandledError.StatusCode)}
+
+		hashed = statusKey.HasKey()
+		pairs[hashed] = object.MapPair{Key: statusKey, Value: statusValue}
+	}
 
 	return &object.Error{Pairs: pairs}
 }
