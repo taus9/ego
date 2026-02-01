@@ -413,7 +413,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		if isError(tryObj) {
 			unhandledError, _ := tryObj.(*object.UnhandledError)
-			errorObj := createErrorObject(unhandledError)
+			tryObj = createErrorObject(unhandledError)
+		}
+
+		errorObj, ok := tryObj.(*object.Error)
+
+		if ok {
 
 			blockEnv := object.NewEnclosedEnvironment(env)
 			blockEnv.Declare("$e", errorObj)
@@ -431,8 +436,12 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 		if isError(tryObj) {
 			unhandledError, _ := tryObj.(*object.UnhandledError)
-			errorObj := createErrorObject(unhandledError)
+			tryObj = createErrorObject(unhandledError)
+		}
 
+		errorObj, ok := tryObj.(*object.Error)
+
+		if ok {
 			env.Declare("$e", errorObj)
 			defer env.Delete("$e")
 
