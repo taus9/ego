@@ -161,7 +161,7 @@ var builtins = map[string]*object.Builtin{
 
 				// if no type key or if type key is an empty string, set it to "error"
 				typeValue, hasType := mapObj.Pairs[(&object.String{Value: "type"}).HasKey()]
-				if !hasType || strings.Trim(typeValue.Value.Inspect(), " ") == "" {
+				if !hasType || strings.TrimSpace(typeValue.Value.Inspect()) == "" {
 					typeKey := &object.String{Value: "type"}
 					typeValue := &object.String{Value: "error"}
 
