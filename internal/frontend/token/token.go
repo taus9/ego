@@ -29,6 +29,7 @@ const (
 	INT    = "INT"    // 1343 - p
 	FLOAT  = "FLOAT"  // 3.14 - p
 	STRING = "STRING" // "foobar" - p
+	EXEC   = "EXEC"   // `ls -la` - p
 
 	// Operators
 
@@ -47,7 +48,7 @@ const (
 	LT_EQ  = "<=" // - p
 	GT_EQ  = ">=" // - p
 
-	EXEC         = "`"
+	BACKTICK     = "`" // - p
 	DOT          = "." // - p
 	COMMA        = "," // - p
 	SINGLE_QUOTE = "'" // - p
