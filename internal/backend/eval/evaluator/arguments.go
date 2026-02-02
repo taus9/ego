@@ -14,10 +14,43 @@ type ArgParser struct {
 	ch           byte
 }
 
+type ExeCommand struct {
+	Command string
+	Args    []string
+}
+
 func NewArgumentParser(input string) *ArgParser {
 	ap := &ArgParser{input: input}
 	ap.readChar()
 	return ap
+}
+
+func (ap *ArgParser) ParseArguments() (*ExeCommand, error) {
+
+	command, err := ap.nextArgument()
+	if err != nil {
+		return nil, err
+	}
+
+	if command == "" {
+		return nil, fmt.Errorf("empty command in exec literal")
+	}
+
+	var args []string
+
+	arg, err := ap.nextArgument()
+	if err != nil {
+		return nil, err
+	}
+	for arg != "" {
+		args = append(args, arg)
+		arg, err = ap.nextArgument()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &ExeCommand{Command: command, Args: args}, nil
 }
 
 func (ap *ArgParser) readChar() {
@@ -30,7 +63,7 @@ func (ap *ArgParser) readChar() {
 	ap.readPosition += 1
 }
 
-func (ap *ArgParser) NextArgument() (string, error) {
+func (ap *ArgParser) nextArgument() (string, error) {
 	ap.skipWhitespace()
 
 	switch ap.ch {
