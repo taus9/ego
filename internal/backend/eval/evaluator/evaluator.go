@@ -14,6 +14,7 @@ import (
 var reservedWords = []string{
 	"nil",
 	"$e",
+	"$a",
 }
 
 var currentToken token.Token
