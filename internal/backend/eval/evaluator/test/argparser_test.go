@@ -10,25 +10,27 @@ func TestArgParser(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    []string
+		wantCmd string
+		wantArg []string
 		wantErr bool
 	}{
 		{
-			name:  "basic and quoted",
-			input: `arg1 arg2 "arg 3"`,
-			// NOTE: quoted args are now returned WITHOUT quotes.
-			want: []string{"arg1", "arg2", "arg 3"},
+			name:    "basic and quoted",
+			input:   `arg1 arg2 "arg 3"`,
+			wantCmd: "arg1",
+			wantArg: []string{"arg2", "arg 3"}, // quoted args returned WITHOUT quotes
 		},
 		{
-			name:  "quoted then unquoted",
-			input: `"quoted arg" unquoted`,
-			// NOTE: quoted args are now returned WITHOUT quotes.
-			want: []string{"quoted arg", "unquoted"},
+			name:    "quoted then unquoted",
+			input:   `"quoted arg" unquoted`,
+			wantCmd: "quoted arg",
+			wantArg: []string{"unquoted"},
 		},
 		{
-			name:  "leading whitespace",
-			input: `   leadingWhitespace`,
-			want:  []string{"leadingWhitespace"},
+			name:    "leading whitespace",
+			input:   `   leadingWhitespace`,
+			wantCmd: "leadingWhitespace",
+			wantArg: []string{},
 		},
 		{
 			name:    "unterminated quote",
@@ -36,14 +38,16 @@ func TestArgParser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:  "brace group single token",
-			input: `{interpolated arg}`,
-			want:  []string{`{interpolated arg}`},
+			name:    "brace group single token",
+			input:   `{interpolated arg}`,
+			wantCmd: `{interpolated arg}`,
+			wantArg: []string{},
 		},
 		{
-			name:  "nested braces preserved",
-			input: `{nested {interpolation}}`,
-			want:  []string{`{nested {interpolation}}`},
+			name:    "nested braces preserved",
+			input:   `{nested {interpolation}}`,
+			wantCmd: `{nested {interpolation}}`,
+			wantArg: []string{},
 		},
 		{
 			name:    "unterminated interpolation",
@@ -56,32 +60,33 @@ func TestArgParser(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:  "mixed spacing",
-			input: `arg1   "arg  two"   {arg3}`,
-			// NOTE: quoted args are now returned WITHOUT quotes.
-			want: []string{"arg1", "arg  two", "{arg3}"},
+			name:    "mixed spacing",
+			input:   `arg1   "arg  two"   {arg3}`,
+			wantCmd: "arg1",
+			wantArg: []string{"arg  two", "{arg3}"},
 		},
 		{
-			name:  "empty",
-			input: ``,
-			want:  []string{},
-		},
-
-		// New: braces inside an unquoted token should NOT split on whitespace inside braces.
-		{
-			name:  "inline brace group in unquoted token",
-			input: `--path={ some file }`,
-			want:  []string{`--path={ some file }`},
+			name:    "empty",
+			input:   ``,
+			wantErr: true,
 		},
 		{
-			name:  "brace group mid-token",
-			input: `hi{ ident }there`,
-			want:  []string{`hi{ ident }there`},
+			name:    "inline brace group in unquoted token",
+			input:   `--path={ some file }`,
+			wantCmd: `--path={ some file }`,
+			wantArg: []string{},
 		},
 		{
-			name:  "multiple tokens with inline brace group",
-			input: `cmd --flag={ a b } tail`,
-			want:  []string{`cmd`, `--flag={ a b }`, `tail`},
+			name:    "brace group mid-token",
+			input:   `hi{ ident }there`,
+			wantCmd: `hi{ ident }there`,
+			wantArg: []string{},
+		},
+		{
+			name:    "multiple tokens with inline brace group",
+			input:   `cmd --flag={ a b } tail`,
+			wantCmd: `cmd`,
+			wantArg: []string{`--flag={ a b }`, `tail`},
 		},
 	}
 
@@ -89,36 +94,37 @@ func TestArgParser(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			parser := evaluator.NewArgumentParser(tt.input)
-
-			var got []string
-			for {
-				arg, err := parser.NextArgument()
-				if err != nil {
-					if tt.wantErr {
-						return
-					}
-					t.Fatalf("input: %q, unexpected error: %v", tt.input, err)
-				}
-				if arg == "" {
-					break
-				}
-				got = append(got, arg)
-			}
+			ec, err := parser.ParseArguments()
 
 			if tt.wantErr {
-				t.Fatalf("input: %q, expected error, got none (args=%v)", tt.input, got)
+				if err == nil {
+					t.Fatalf("input: %q, expected error, got none (cmd=%+v)", tt.input, ec)
+				}
+				return
 			}
 
-			if len(got) != len(tt.want) {
+			if err != nil {
+				t.Fatalf("input: %q, unexpected error: %v", tt.input, err)
+			}
+
+			if ec == nil {
+				t.Fatalf("input: %q, expected ExecCommand, got nil", tt.input)
+			}
+
+			if ec.Command != tt.wantCmd {
+				t.Fatalf("input: %q, command: expected %q, got %q", tt.input, tt.wantCmd, ec.Command)
+			}
+
+			if len(ec.Args) != len(tt.wantArg) {
 				t.Fatalf("input: %q, expected %d args, got %d args (%v)",
-					tt.input, len(tt.want), len(got), got,
+					tt.input, len(tt.wantArg), len(ec.Args), ec.Args,
 				)
 			}
 
-			for i := range tt.want {
-				if got[i] != tt.want[i] {
+			for i := range tt.wantArg {
+				if ec.Args[i] != tt.wantArg[i] {
 					t.Fatalf("input: %q, arg[%d]: expected %q, got %q",
-						tt.input, i, tt.want[i], got[i],
+						tt.input, i, tt.wantArg[i], ec.Args[i],
 					)
 				}
 			}
