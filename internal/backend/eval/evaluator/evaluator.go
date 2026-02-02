@@ -1004,44 +1004,21 @@ func unwrapReturnValue(obj object.Object) object.Object {
 	return obj
 }
 
-func resolveCommandString(commandStr string, env *object.Environment) (string, error) {
-	var resultStr strings.Builder
-	i := 0
-	for i < len(commandStr) {
-		if commandStr[i] == '{' {
-			j := i + 1
-			for j < len(commandStr) && commandStr[j] != '}' {
-				j++
-			}
-			if j == len(commandStr) {
-				return "", fmt.Errorf("unterminated identifier in exec command")
-			}
-			identName := commandStr[i+1 : j]
-			identObj := evalIdentifier(&ast.Identifier{Value: identName}, env)
-			if isError(identObj) {
-				return "", fmt.Errorf("identifier not found: %s", identName)
-			}
-			fmt.Fprintf(&resultStr, "%v", identObj.Inspect())
-			i = j + 1
-		} else {
-			resultStr.WriteString(string(commandStr[i]))
-			i++
-		}
-	}
-
-	return resultStr.String(), nil
-}
-
 func evalExecLiteralExpression(node *ast.ExecLiteral, env *object.Environment) object.Object {
-	commandStr, err := resolveCommandString(node.Command, env)
+	ap := NewArgumentParser(node.Command)
+
+	rawCommand, err := ap.ParseArguments()
 	if err != nil {
 		return newError("%s", err.Error())
 	}
 
-	command, args := parseArguments(commandStr)
-	if command == "" {
-		return newError("empty command in exec literal")
+	exeCommand, err := resolveExecCommandTokens(rawCommand, env)
+	if err != nil {
+		return newError("%s", err.Error())
 	}
+
+	command := exeCommand.Command
+	args := exeCommand.Args
 
 	cmd := exec.Command(command, args...)
 	output, err := cmd.CombinedOutput()
@@ -1051,23 +1028,7 @@ func evalExecLiteralExpression(node *ast.ExecLiteral, env *object.Environment) o
 		return newExecError(string(output), exitErr.ExitCode())
 	}
 
-	return createExecObject(commandStr, string(output))
-}
-
-func parseArguments(commandStr string) (string, []string) {
-
-	ap := NewArgumentParser(commandStr)
-	command := ap.NextArgument()
-
-	var args []string
-
-	arg := ap.NextArgument()
-	for arg != "" {
-		args = append(args, arg)
-		arg = ap.NextArgument()
-	}
-
-	return command, args
+	return createExecObject(command, string(output))
 }
 
 func createExecObject(command string, output string) *object.Exec {
@@ -1273,4 +1234,87 @@ func createErrorObject(unhandledError *object.UnhandledError) *object.Error {
 	}
 
 	return &object.Error{Pairs: pairs}
+}
+
+func resolveExecCommandTokens(ec *ExeCommand, env *object.Environment) (*ExeCommand, error) {
+
+	cmd, err := resolveToken(ec.Command, env)
+	if err != nil {
+		return nil, err
+	}
+	if cmd == "" {
+		return nil, fmt.Errorf("empty command after interpolation")
+	}
+
+	args := make([]string, 0, len(ec.Args))
+	for _, tok := range ec.Args {
+		s, err := resolveToken(tok, env)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, s)
+	}
+
+	return &ExeCommand{Command: cmd, Args: args}, nil
+}
+
+func resolveToken(token string, env *object.Environment) (string, error) {
+	var b strings.Builder
+	b.Grow(len(token))
+
+	for i := 0; i < len(token); {
+		if token[i] != '{' {
+			b.WriteByte(token[i])
+			i++
+			continue
+		}
+		// found '{', look for closing '}'
+		j := i + 1
+		for j < len(token) && token[j] != '}' {
+			j++
+		}
+		if j >= len(token) {
+			return "", fmt.Errorf("unterminated identifier in exec token")
+		}
+
+		inner := strings.TrimSpace(token[i+1 : j])
+		if inner == "" {
+			return "", fmt.Errorf("empty identifier in exec token")
+		}
+
+		obj := evalIdentifier(&ast.Identifier{Value: inner}, env)
+		if isError(obj) {
+			return "", fmt.Errorf("identifier not found: %s", inner)
+		}
+
+		s, err := toArgString(obj)
+		if err != nil {
+			return "", err
+		}
+
+		b.WriteString(s)
+		i = j + 1
+	}
+
+	return b.String(), nil
+}
+
+func toArgString(obj object.Object) (string, error) {
+	switch v := obj.(type) {
+	case *object.String:
+		return v.Value, nil
+	case *object.Integer:
+		return strconv.FormatInt(v.Value, 10), nil
+	case *object.Float:
+		return strconv.FormatFloat(v.Value, 'f', -1, 64), nil
+	case *object.Boolean:
+		if v.Value {
+			return "true", nil
+		}
+		return "false", nil
+	case *object.Nil:
+		return "", fmt.Errorf("cannot interpolate nil into exec command")
+	default:
+		return "", fmt.Errorf("cannot interpolate %s into exec command", obj.Type())
+	}
 }

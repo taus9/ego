@@ -1,9 +1,7 @@
 package evaluator
 
 import (
-	"ego/internal/backend/eval/object"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -164,23 +162,5 @@ func (ap *ArgParser) readBraceGroup() (string, error) {
 func (ap *ArgParser) skipWhitespace() {
 	for ap.ch == ' ' || ap.ch == '\t' || ap.ch == '\r' || ap.ch == '\n' {
 		ap.readChar()
-	}
-}
-
-func toArgString(obj object.Object) (string, error) {
-	switch v := obj.(type) {
-	case *object.String:
-		return v.Value, nil
-	case *object.Integer:
-		return strconv.FormatInt(v.Value, 10), nil
-	case *object.Float:
-		return strconv.FormatFloat(v.Value, 'f', -1, 64), nil
-	case *object.Boolean:
-		if v.Value {
-			return "true", nil
-		}
-		return "false", nil
-	default:
-		return "", fmt.Errorf("cannot interpolate %s into exec command", obj.Type())
 	}
 }
