@@ -1025,14 +1025,21 @@ func evalExecLiteralExpression(node *ast.ExecLiteral, env *object.Environment) o
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		exitErr := err.(*exec.ExitError)
-		return newExecError(string(output), exitErr.ExitCode())
+
+		var exitCode int
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			exitCode = exitErr.ExitCode()
+		} else {
+			exitCode = 127
+		}
+
+		return newExecError(string(output), exitCode)
 	}
 
-	return createExecObject(command, string(output))
+	return createExecObject(command, args, string(output))
 }
 
-func createExecObject(command string, output string) *object.Exec {
+func createExecObject(command string, args []string, output string) *object.Exec {
 	pairs := make(map[object.HashKey]object.MapPair)
 
 	commandKey := &object.String{Value: "command"}
@@ -1040,6 +1047,16 @@ func createExecObject(command string, output string) *object.Exec {
 
 	hashed := commandKey.HasKey()
 	pairs[hashed] = object.MapPair{Key: commandKey, Value: commandValue}
+
+	argsKey := &object.String{Value: "args"}
+	argsElements := make([]object.Object, len(args))
+	for i, arg := range args {
+		argsElements[i] = &object.String{Value: arg}
+	}
+	argsValue := &object.Array{Elements: argsElements}
+
+	hashed = argsKey.HasKey()
+	pairs[hashed] = object.MapPair{Key: argsKey, Value: argsValue}
 
 	outputKey := &object.String{Value: "output"}
 	outputValue := &object.String{Value: output}
