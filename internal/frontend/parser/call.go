@@ -8,12 +8,11 @@ import (
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	p.stackTrace.Push(CALL)
 	exp := &ast.CallExpression{Token: p.curToken, Function: function}
-	p.nextToken() // consume '('
 	exp.Arguments = p.parseExpressionList(token.RPAREN)
 	if p.errorExist() {
 		return nil
 	}
-	// ')' has been consumed in parseCallArguments
+
 	p.stackTrace.Pop()
 	return exp
 }
